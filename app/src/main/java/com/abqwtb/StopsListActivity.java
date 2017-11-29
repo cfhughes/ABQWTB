@@ -18,6 +18,10 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -36,6 +40,7 @@ public class StopsListActivity extends AppCompatActivity implements LoaderManage
   private LocationRequest mLocationRequest;
   private StopsAdapter cursorAdapter;
   private static Location lastLocation = new Location("nothing");
+  private FrameLayout frameLayout;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +60,7 @@ public class StopsListActivity extends AppCompatActivity implements LoaderManage
     //End Strict mode code
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_stops_list);
+    frameLayout = findViewById(R.id.main_container);
     mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
     mLocationCallback = new LocationCallback() {
@@ -64,11 +70,21 @@ public class StopsListActivity extends AppCompatActivity implements LoaderManage
         getSupportLoaderManager().restartLoader(0, null, StopsListActivity.this);
       }
     };
-
+    frameLayout.setVisibility(View.GONE);
     cursorAdapter =
         new StopsAdapter(StopsListActivity.this, null, false);
-    ListView listContent = (ListView) findViewById(R.id.content_list);
+    final ListView listContent = (ListView) findViewById(R.id.content_list);
     listContent.setAdapter(cursorAdapter);
+
+    listContent.setOnItemClickListener(new OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        StopFragment f = StopFragment.newInstance((Integer) view.getTag());
+        getSupportFragmentManager().beginTransaction().replace(R.id.main_container,f).commit();
+        listContent.setVisibility(View.GONE);
+        frameLayout.setVisibility(View.VISIBLE);
+      }
+    });
 
     mFusedLocationClient.getLastLocation()
         .addOnSuccessListener(StopsListActivity.this, new OnSuccessListener<Location>() {
@@ -136,7 +152,7 @@ public class StopsListActivity extends AppCompatActivity implements LoaderManage
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
     Uri uri = StopsProvider.CONTENT_URI;
-    return new CursorLoader(this, uri, new String[]{"stop_code _id","stop_name","(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)"},"`stop_lat` > ? AND `stop_lat` < ? AND `stop_lon` > ? AND `stop_lon` < ?", new String[]{
+    return new CursorLoader(this, uri, new String[]{"stop_id _id","stop_name","(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)"},"`stop_lat` > ? AND `stop_lat` < ? AND `stop_lon` > ? AND `stop_lon` < ?", new String[]{
         String.valueOf(lastLocation.getLatitude()-0.015),
         String.valueOf(lastLocation.getLatitude()+0.015),
         String.valueOf(lastLocation.getLongitude()-0.015),
@@ -183,4 +199,7 @@ public class StopsListActivity extends AppCompatActivity implements LoaderManage
     }
   }
 
+  public DbHelper getDbHelper() {
+    return dbHelper;
+  }
 }

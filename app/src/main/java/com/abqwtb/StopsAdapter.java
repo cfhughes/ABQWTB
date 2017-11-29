@@ -31,6 +31,7 @@ public class StopsAdapter extends CursorAdapter {
 
   @Override
   public void bindView(View view, Context context, Cursor cursor) {
+    view.setTag(cursor.getInt(0));
     TextView name = view.findViewById(R.id.stop_name);
     name.setText(cursor.getString(1));
     String[] routes = new String[0];
@@ -42,7 +43,7 @@ public class StopsAdapter extends CursorAdapter {
     for (String route:routes){
       RouteIcon icon = RouteIcon.routeIcons.get(Integer.parseInt(route.trim()));
       if (icon != null) {
-        ll.addView(icon.getView(context, ll));
+        ll.addView(icon.getView(context,ll));
       }
     }
   }
