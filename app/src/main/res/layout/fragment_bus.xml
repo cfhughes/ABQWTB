@@ -1,19 +1,33 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
   tools:context="com.abqwtb.BusFragment"
   android:orientation="vertical">
 
-  <!-- TODO: Update blank fragment layout -->
-  <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:text="@string/hello_blank_fragment"/>
-
   <FrameLayout
     android:id="@+id/map_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"></FrameLayout>
 
-</LinearLayout>
+  <ProgressBar
+    android:id="@+id/bus_update_progress"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:indeterminate="false"
+    style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+    android:progress="0"
+    android:background="#d7e0e0e0"/>
+
+  <TextView
+    android:id="@+id/bus_next_stop"
+    android:layout_below="@id/bus_update_progress"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textSize="20sp"
+    android:text="Next Stop"
+    android:background="#d7e0e0e0"/>
+
+
+
+</RelativeLayout>

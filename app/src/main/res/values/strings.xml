@@ -1,6 +1,7 @@
 <resources>
-  <string name="app_name">ABQWTB</string>
+  <string name="app_name">ABQ Bus</string>
 
   <!-- TODO: Remove or change this placeholder text -->
   <string name="hello_blank_fragment">Hello blank fragment</string>
+  <string name="no_more_busses">No More Buses Scheduled Today</string>
 </resources>

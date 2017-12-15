@@ -7,10 +7,13 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.abqwtb.model.BusTrip;
 import com.android.volley.Request;
@@ -19,6 +22,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
@@ -30,6 +35,7 @@ public class StopFragment extends Fragment {
 
   private int stop_id;
   private TextView mainText;
+  private Tracker mTracker;
 
   public StopFragment() {
     // Required empty public constructor
@@ -50,6 +56,9 @@ public class StopFragment extends Fragment {
     if (getArguments() != null) {
       stop_id = getArguments().getInt(ARG_STOP_ID);
     }
+
+    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
+    mTracker = application.getDefaultTracker();
 
   }
 
@@ -89,9 +98,7 @@ public class StopFragment extends Fragment {
                 trips[i].route = Integer.parseInt(item[1]);
                 trips[i].secondsLate = Float.parseFloat(item[2]);
                 trips[i].busId = Integer.parseInt(item[3].trim());
-              } catch (ParseException e) {
-                //e.printStackTrace();
-              } catch (NumberFormatException e) {
+              } catch (ParseException | NumberFormatException e) {
                 //e.printStackTrace();
               }
             }
@@ -100,8 +107,11 @@ public class StopFragment extends Fragment {
             schedule.setOnItemClickListener(new OnItemClickListener() {
               @Override
               public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                BusFragment f = BusFragment.newInstance((Integer) view.getTag());
-                getFragmentManager().beginTransaction().replace(R.id.main_container,f).addToBackStack("bus").commit();
+                if ((Integer) view.getTag() > 0) {
+                  BusFragment f = BusFragment.newInstance((Integer) view.getTag());
+                  getFragmentManager().beginTransaction().replace(R.id.main_container, f)
+                      .addToBackStack("bus").commit();
+                }
               }
             });
           }
@@ -116,5 +126,12 @@ public class StopFragment extends Fragment {
 
 
     return view;
+  }
+
+  @Override
+  public void onResume() {
+    super.onResume();
+    mTracker.setScreenName("ABQBus Schedule");
+    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 }
