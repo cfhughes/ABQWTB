@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.abqwtb.ScheduleAdapter.ViewHolder;
 import com.abqwtb.model.BusTrip;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -36,6 +37,7 @@ public class StopFragment extends Fragment {
   private int stop_id;
   private TextView mainText;
   private Tracker mTracker;
+  private ScheduleAdapter adapter;
 
   public StopFragment() {
     // Required empty public constructor
@@ -61,6 +63,14 @@ public class StopFragment extends Fragment {
     mTracker = application.getDefaultTracker();
 
   }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    adapter.stopTimer();
+  }
+
+
 
   @Override
   public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -102,13 +112,13 @@ public class StopFragment extends Fragment {
                 //e.printStackTrace();
               }
             }
-            ArrayAdapter<BusTrip> adapter = new ScheduleAdapter(getContext(),android.R.layout.simple_list_item_1, trips);
+            adapter = new ScheduleAdapter(getContext(), trips);
             schedule.setAdapter(adapter);
             schedule.setOnItemClickListener(new OnItemClickListener() {
               @Override
               public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if ((Integer) view.getTag() > 0) {
-                  BusFragment f = BusFragment.newInstance((Integer) view.getTag());
+                if (((ViewHolder) view.getTag()).trip.busId > 0) {
+                  BusFragment f = BusFragment.newInstance(((ViewHolder) view.getTag()).trip.busId);
                   getFragmentManager().beginTransaction().replace(R.id.main_container, f)
                       .addToBackStack("bus").commit();
                 }
@@ -133,5 +143,8 @@ public class StopFragment extends Fragment {
     super.onResume();
     mTracker.setScreenName("ABQBus Schedule");
     mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    if (adapter != null) {
+      adapter.startUpdateTimer();
+    }
   }
 }
