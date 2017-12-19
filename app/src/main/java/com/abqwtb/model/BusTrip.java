@@ -5,14 +5,10 @@ import java.util.Date;
 
 public class BusTrip {
 
-  public Date scheduledTime;
+  public long scheduledTime = -1;
   public int route;
   public float secondsLate;
   public int busId;
-
-  public BusTrip(Date scheduledTime) {
-    this.scheduledTime = scheduledTime;
-  }
 
   @Override
   public String toString() {

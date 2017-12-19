@@ -71,7 +71,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
       request = new StringRequest(Method.GET, url, new Listener<String>() {
         @Override
         public void onResponse(String response) {
-          Log.v("Location Response", response);
+          //Log.v("Location Response", response);
           String[] coords = response.split(":");
           nextStop.setText(String.format("Next Stop: %s", coords[0]));
           LatLng position = new LatLng(Double.parseDouble(coords[1]), Double.parseDouble(coords[2]));
@@ -91,6 +91,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
 
     ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
     mTracker = application.getDefaultTracker();
+    mTracker.enableAdvertisingIdCollection(true);
   }
 
   @Override
