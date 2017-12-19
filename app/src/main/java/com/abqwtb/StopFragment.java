@@ -3,7 +3,9 @@ package com.abqwtb;
 import android.content.CursorLoader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +40,13 @@ public class StopFragment extends Fragment {
   private TextView mainText;
   private Tracker mTracker;
   private ScheduleAdapter adapter;
+  private RequestQueue queue;
+  private ListView schedule;
+  private Handler mHandler;
+  private StringRequest stringRequest;
+  private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+  private Runnable mRunnable;
+
 
   public StopFragment() {
     // Required empty public constructor
@@ -57,58 +66,36 @@ public class StopFragment extends Fragment {
     super.onCreate(savedInstanceState);
     if (getArguments() != null) {
       stop_id = getArguments().getInt(ARG_STOP_ID);
+      Log.v("Stop_id",""+stop_id);
     }
-
-    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
-    mTracker = application.getDefaultTracker();
-
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    adapter.stopTimer();
-  }
-
-
-
-  @Override
-  public View onCreateView(LayoutInflater inflater, ViewGroup container,
-      Bundle savedInstanceState) {
-    // Inflate the layout for this fragment
-    View view = inflater.inflate(R.layout.fragment_stop, container, false);
-    mainText = view.findViewById(R.id.stop_main_text);
-    DbHelper helper = ((StopsListActivity)getActivity()).getDbHelper();
-    helper.openDataBase();
-    Cursor cursor = helper.query("stops_local",new String[]{"stop_name"},"stop_id = ?",
-        new String[]{String.valueOf(stop_id)},null,null,null);
-    cursor.moveToFirst();
-    mainText.setText(cursor.getString(0));
-    cursor.close();
-    helper.close();
-
-    final ListView schedule = view.findViewById(R.id.schedule);
-
-    RequestQueue queue = Volley.newRequestQueue(getContext());
 
     String url ="http://www.abqwtb.com/android.php?version=6&stop_id="+stop_id;
 
-    StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
+    mTracker = application.getDefaultTracker();
+    mTracker.enableAdvertisingIdCollection(true);
+
+    mHandler = new Handler();
+    queue = Volley.newRequestQueue(getContext());
+
+    stringRequest = new StringRequest(Request.Method.GET, url,
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
             // Display the first 500 characters of the response string.
             String[] sched = response.split("\\|");
             BusTrip[] trips = new BusTrip[sched.length];
-            final SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+
             for (int i = 0;i < sched.length;i++){
               String[] item = sched[i].split(";");
               try {
-                trips[i] = new BusTrip(sdf.parse(item[0]));
+                trips[i] = new BusTrip();
+                String[] time = item[0].split(":");
+                trips[i].scheduledTime = (7 * 60 * 60 + Integer.valueOf(time[0]) * 60 * 60 + Integer.valueOf(time[1]) * 60 + Integer.valueOf(time[2])) * 1000;
                 trips[i].route = Integer.parseInt(item[1]);
                 trips[i].secondsLate = Float.parseFloat(item[2]);
                 trips[i].busId = Integer.parseInt(item[3].trim());
-              } catch (ParseException | NumberFormatException e) {
+              } catch (NumberFormatException e){
                 //e.printStackTrace();
               }
             }
@@ -131,9 +118,43 @@ public class StopFragment extends Fragment {
 
       }
     });
-// Add the request to the RequestQueue.
-    queue.add(stringRequest);
 
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    adapter.stopTimer();
+    mHandler.removeCallbacks(mRunnable);
+  }
+
+
+
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container,
+      Bundle savedInstanceState) {
+    // Inflate the layout for this fragment
+    View view = inflater.inflate(R.layout.fragment_stop, container, false);
+    mainText = view.findViewById(R.id.stop_main_text);
+    DbHelper helper = ((StopsListActivity)getActivity()).getDbHelper();
+    Cursor cursor = helper.query("stops_local",new String[]{"stop_name"},"stop_code = ?",
+        new String[]{String.valueOf(stop_id)},null,null,null);
+    cursor.moveToFirst();
+    mainText.setText(cursor.getString(0));
+    cursor.close();
+    helper.close();
+
+    schedule = view.findViewById(R.id.schedule);
+
+    mRunnable = new Runnable(){
+
+      @Override
+      public void run() {
+        queue.add(stringRequest);
+        mHandler.postDelayed(mRunnable,1000*15); // 15 seconds
+      }
+    };
+    mHandler.post(mRunnable);
 
     return view;
   }
@@ -142,9 +163,10 @@ public class StopFragment extends Fragment {
   public void onResume() {
     super.onResume();
     mTracker.setScreenName("ABQBus Schedule");
-    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    mTracker.send(new HitBuilders.ScreenViewBuilder().setCustomDimension(1,""+stop_id).build());
     if (adapter != null) {
       adapter.startUpdateTimer();
+      mHandler.post(mRunnable);
     }
   }
 }

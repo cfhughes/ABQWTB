@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -16,8 +15,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.TimeZone;
 
 public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
@@ -28,7 +26,10 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     @Override
     public void run() {
       synchronized (lstHolders) {
-        long currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
+        if (currentTime < 10 * 60 * 60 * 1000){
+          currentTime += 24 * 60 * 60 * 1000;
+        }
         for (ViewHolder holder : lstHolders) {
           holder.updateTime(currentTime);
         }
@@ -54,7 +55,7 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
   public View getView(int position, View convertView, ViewGroup parent) {
     ViewHolder viewHolder;
     if (convertView == null) {
-      convertView = LayoutInflater.from(getContext()).inflate(R.layout.schedule_list_item, parent, false);
+      convertView = lf.inflate(R.layout.schedule_list_item, parent, false);
       viewHolder = new ViewHolder();
       viewHolder.scheduleTime = convertView.findViewById(R.id.schedule_time);
       viewHolder.scheduleTimer = convertView.findViewById(R.id.schedule_timer);
@@ -87,18 +88,29 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
     public void setData(BusTrip data){
       trip = data;
-      if (trip != null) {
+      if (trip.scheduledTime != -1) {
         scheduled = Calendar.getInstance();
-        scheduled.setTime(trip.scheduledTime);
-        scheduled.add(Calendar.SECOND, Math.round(trip.secondsLate));
 
-        updateTime(System.currentTimeMillis());
+        scheduled.setTimeInMillis(trip.scheduledTime);
 
         scheduleTime.setText(DateFormat.getTimeInstance().format(scheduled.getTime()));
 
+        scheduled.add(Calendar.SECOND, Math.round(trip.secondsLate));
+
+        long now = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
+        //Add 24 hours for past midnight service
+        if (now < 10 * 60 * 60 * 1000){
+          now += 24 * 60 * 60 * 1000;
+        }
+        updateTime(now);
+
+
+
         RouteIcon icon = RouteIcon.routeIcons.get(trip.route);
         ll.removeAllViews();
-        ll.addView(icon.getView(getContext(), ll));
+        if (icon != null) {
+          ll.addView(icon.getView(getContext(), ll));
+        }
 
         //Log.v("Late", ""+trip.secondsLate);
         if (trip.secondsLate > 0){
@@ -121,10 +133,10 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
     }
 
-    public void updateTime(long time){
-      if (trip != null) {
-        long now = time % (24 * 60 * 60 * 1000);
+    public void updateTime(long now){
+      if (trip.scheduledTime != -1) {
         long diff = scheduled.getTimeInMillis() - now;
+        //Log.i("diff",""+scheduled.getTimeInMillis()+ " - " + now + " = " + diff);
         if (diff < 0) {
           diff = 0;
         }

@@ -87,8 +87,6 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
       mParam2 = getArguments().getString(ARG_PARAM2);
     }
 
-    dbHelper = ((StopsListActivity)getActivity()).getDbHelper();
-
     mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
     mLocationCallback = new LocationCallback() {
@@ -112,10 +110,14 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
 
     new LoadIcons().execute();
 
+    cursorAdapter =
+        new StopsAdapter(getActivity(), null, false);
+
     getActivity().getSupportLoaderManager().initLoader(0, null, this);
 
     ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
     mTracker = application.getDefaultTracker();
+    mTracker.enableAdvertisingIdCollection(true);
   }
 
   @Override
@@ -124,8 +126,7 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_stops_list, container, false);
 
-    cursorAdapter =
-        new StopsAdapter(getActivity(), null, false);
+
     final ListView listContent = (ListView) view.findViewById(R.id.content_list);
     listContent.setAdapter(cursorAdapter);
 
@@ -192,7 +193,7 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
     Uri uri = StopsProvider.CONTENT_URI;
-    return new CursorLoader(getActivity(), uri, new String[]{"stop_id _id","stop_name","(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)"},"`stop_lat` > ? AND `stop_lat` < ? AND `stop_lon` > ? AND `stop_lon` < ?", new String[]{
+    return new CursorLoader(getActivity(), uri, new String[]{"stop_code _id","stop_name","(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)"},"`stop_lat` > ? AND `stop_lat` < ? AND `stop_lon` > ? AND `stop_lon` < ?", new String[]{
         String.valueOf(lastLocation.getLatitude()-0.015),
         String.valueOf(lastLocation.getLatitude()+0.015),
         String.valueOf(lastLocation.getLongitude()-0.015),
@@ -214,6 +215,8 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     protected Object doInBackground(Object... objects) {
+
+      dbHelper = ((StopsListActivity)getActivity()).getDbHelper();
 
       Cursor routes = dbHelper.query("routes",new String[]{"route_short_name","route_color","route_text_color"},null,null,null,null,null);
       while (routes.moveToNext()){

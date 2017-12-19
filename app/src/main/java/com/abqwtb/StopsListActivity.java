@@ -40,7 +40,7 @@ public class StopsListActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
 
-    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+/*    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
         .detectDiskReads()
         .detectDiskWrites()
         .detectNetwork()   // or .detectAll() for all detectable problems
@@ -51,19 +51,21 @@ public class StopsListActivity extends AppCompatActivity {
         .detectLeakedClosableObjects()
         .penaltyLog()
         .penaltyDeath()
-        .build());
+        .build());*/
     //End Strict mode code
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_stops_list);
     frameLayout = findViewById(R.id.main_container);
 
     dbCreate();
-
-    getSupportFragmentManager().beginTransaction().add(R.id.main_container,new StopsListFragment()).commit();
+    if (savedInstanceState == null) {
+      getSupportFragmentManager().beginTransaction()
+          .replace(R.id.main_container, new StopsListFragment()).commit();
+    }
 
   }
 
-  private void dbCreate(){
+  private void dbCreate() {
     dbHelper = new DbHelper(this);
     try {
       dbHelper.createDataBase();
@@ -75,9 +77,8 @@ public class StopsListActivity extends AppCompatActivity {
 
   }
 
-
-
   public DbHelper getDbHelper() {
+    dbCreate();
     return dbHelper;
   }
 }
