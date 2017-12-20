@@ -14,13 +14,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 public class DbHelper extends SQLiteOpenHelper {
+
+  public static final int VERSION = 10;
   String DB_PATH = null;
   private static String DB_NAME = "stops_db";
   private SQLiteDatabase myDataBase;
   private final Context myContext;
 
   public DbHelper(Context context) {
-    super(context, DB_NAME, null, 10);
+    super(context, DB_NAME, null, VERSION);
     this.myContext = context;
     if(android.os.Build.VERSION.SDK_INT >= 17){
       DB_PATH = context.getApplicationInfo().dataDir + "/databases/"+DB_NAME;
@@ -29,15 +31,29 @@ public class DbHelper extends SQLiteOpenHelper {
     {
       DB_PATH = "/data/data/" + context.getPackageName() + "/databases/"+DB_NAME;
     }
-    Log.e("Path 1", DB_PATH);
+    Log.i("Path 1", DB_PATH);
   }
 
 
   public synchronized void createDataBase() throws IOException {
     boolean dbExist = checkDataBase();
     if (dbExist) {
+      try {
+        openDataBase();
+        Cursor c = rawQuery("SELECT * FROM version");
+        c.moveToFirst();
+        int v = c.getInt(0);
+        if (v < VERSION) {
+          copyDataBase();
+        }
+      } catch (SQLException e) {
+        e.printStackTrace();
+        copyDataBase();
+      } finally {
+        close();
+      }
     } else {
-      this.getReadableDatabase();
+      this.getWritableDatabase();
       this.close();
       try {
         copyDataBase();
@@ -54,6 +70,7 @@ public class DbHelper extends SQLiteOpenHelper {
   }
 
   private void copyDataBase() throws IOException {
+    Log.i("dbcopy","Copying Database File");
     InputStream myInput = myContext.getAssets().open(DB_NAME);
     String outFileName = DB_PATH;
     File old = new File(DB_PATH);
@@ -92,6 +109,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+    Log.i("Upgrade","Upgrading Database " + oldVersion);
     if (newVersion > oldVersion)
       try {
         copyDataBase();

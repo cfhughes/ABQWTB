@@ -108,8 +108,6 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
           }
         });
 
-    new LoadIcons().execute();
-
     cursorAdapter =
         new StopsAdapter(getActivity(), null, false);
 
@@ -211,22 +209,5 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
     cursorAdapter.swapCursor(null);
   }
 
-  public class LoadIcons extends AsyncTask<Object, Object, Object> {
 
-    @Override
-    protected Object doInBackground(Object... objects) {
-
-      dbHelper = ((StopsListActivity)getActivity()).getDbHelper();
-
-      Cursor routes = dbHelper.query("routes",new String[]{"route_short_name","route_color","route_text_color"},null,null,null,null,null);
-      while (routes.moveToNext()){
-        RouteIcon.routeIcons.put(Integer.parseInt(routes.getString(0).trim()),new RouteIcon(Integer.parseInt(routes.getString(0).trim()),
-            Color.parseColor("#"+routes.getString(1)),Color.parseColor("#"+routes.getString(2))));
-      }
-      routes.close();
-      dbHelper.close();
-
-      return null;
-    }
-  }
 }
