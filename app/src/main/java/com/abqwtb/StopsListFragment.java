@@ -191,7 +191,7 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
     Uri uri = StopsProvider.CONTENT_URI;
-    return new CursorLoader(getActivity(), uri, new String[]{"stop_code _id","stop_name","(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)"},"`stop_lat` > ? AND `stop_lat` < ? AND `stop_lon` > ? AND `stop_lon` < ?", new String[]{
+    return new CursorLoader(getActivity(), uri, new String[]{"stop_code _id","stop_name","(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)", "direction"},"`stop_lat` > ? AND `stop_lat` < ? AND `stop_lon` > ? AND `stop_lon` < ?", new String[]{
         String.valueOf(lastLocation.getLatitude()-0.015),
         String.valueOf(lastLocation.getLatitude()+0.015),
         String.valueOf(lastLocation.getLongitude()-0.015),

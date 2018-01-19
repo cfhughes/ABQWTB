@@ -1,6 +1,6 @@
 package com.abqwtb;
 
-import android.content.CursorLoader;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,13 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.abqwtb.ScheduleAdapter.ViewHolder;
 import com.abqwtb.model.BusTrip;
@@ -27,7 +23,6 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 public class StopFragment extends Fragment {
@@ -37,7 +32,6 @@ public class StopFragment extends Fragment {
   private static final String ARG_STOP_ID = "stop_id";
 
   private int stop_id;
-  private TextView mainText;
   private Tracker mTracker;
   private ScheduleAdapter adapter;
   private RequestQueue queue;
@@ -46,6 +40,7 @@ public class StopFragment extends Fragment {
   private StringRequest stringRequest;
   private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
   private Runnable mRunnable;
+  private Context context;
 
 
   public StopFragment() {
@@ -99,7 +94,7 @@ public class StopFragment extends Fragment {
                 //e.printStackTrace();
               }
             }
-            adapter = new ScheduleAdapter(getContext(), trips);
+            adapter = new ScheduleAdapter(context, trips);
             schedule.setAdapter(adapter);
             schedule.setOnItemClickListener(new OnItemClickListener() {
               @Override
@@ -124,7 +119,9 @@ public class StopFragment extends Fragment {
   @Override
   public void onStop() {
     super.onStop();
-    adapter.stopTimer();
+    if (adapter != null) {
+      adapter.stopTimer();
+    }
     mHandler.removeCallbacks(mRunnable);
   }
 
@@ -135,14 +132,14 @@ public class StopFragment extends Fragment {
       Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_stop, container, false);
-    mainText = view.findViewById(R.id.stop_main_text);
+    TextView mainText = view.findViewById(R.id.stop_main_text);
     DbHelper helper = ((StopsListActivity)getActivity()).getDbHelper();
-    Cursor cursor = helper.query("stops_local",new String[]{"stop_name"},"stop_code = ?",
+    Cursor cursor = helper.query("stops_local",new String[]{"stop_name","direction"},"stop_code = ?",
         new String[]{String.valueOf(stop_id)},null,null,null);
     cursor.moveToFirst();
-    mainText.setText(cursor.getString(0));
+    mainText.setText(cursor.getString(0) + " " + cursor.getString(1));
     cursor.close();
-    helper.close();
+    //helper.close();
 
     schedule = view.findViewById(R.id.schedule);
 
@@ -157,6 +154,12 @@ public class StopFragment extends Fragment {
     mHandler.post(mRunnable);
 
     return view;
+  }
+
+  @Override
+  public void onAttach(Context context) {
+    super.onAttach(context);
+    this.context = context;
   }
 
   @Override

@@ -95,7 +95,7 @@ public class StopsListActivity extends AppCompatActivity {
             Color.parseColor("#"+routes.getString(1)),Color.parseColor("#"+routes.getString(2))));
       }
       routes.close();
-      dbHelper.close();
+      //dbHelper.close();
 
       return null;
     }
