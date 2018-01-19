@@ -34,6 +34,8 @@ public class StopsAdapter extends CursorAdapter {
     view.setTag(cursor.getInt(0));
     TextView name = view.findViewById(R.id.stop_name);
     name.setText(cursor.getString(1));
+    TextView direction = view.findViewById(R.id.stop_direction);
+    direction.setText(cursor.getString(3));
     String[] routes = new String[0];
     if (cursor.getString(2) != null) {
       routes = cursor.getString(2).split(",");
