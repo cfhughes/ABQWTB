@@ -57,7 +57,7 @@ public class StopsListActivity extends AppCompatActivity {
     setContentView(R.layout.activity_stops_list);
     frameLayout = findViewById(R.id.main_container);
 
-    dbCreate();
+    getDbHelper();
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_container, new StopsListFragment()).commit();
@@ -77,16 +77,21 @@ public class StopsListActivity extends AppCompatActivity {
     dbHelper.openDataBase();
   }
 
-  public DbHelper getDbHelper() {
+  public synchronized DbHelper getDbHelper() {
     dbCreate();
     return dbHelper;
+  }
+
+  @Override
+  protected void onDestroy() {
+    dbHelper.close();
+    super.onDestroy();
   }
 
   public class LoadIcons extends AsyncTask<Object, Object, Object> {
 
     @Override
     protected Object doInBackground(Object... objects) {
-      dbHelper.close();
       getDbHelper();
 
       Cursor routes = dbHelper.query("routes",new String[]{"route_short_name","route_color","route_text_color"},null,null,null,null,null);

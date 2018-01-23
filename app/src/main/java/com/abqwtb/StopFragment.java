@@ -1,6 +1,9 @@
 package com.abqwtb;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -110,7 +113,17 @@ public class StopFragment extends Fragment {
         }, new Response.ErrorListener() {
       @Override
       public void onErrorResponse(VolleyError error) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("An error occurred while retrieving data, please check your internet connection.");
+        builder.setTitle("Connection Error");
+        builder.setPositiveButton("Ok", new OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialog, int which) {
 
+          }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
       }
     });
 
@@ -133,7 +146,7 @@ public class StopFragment extends Fragment {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_stop, container, false);
     TextView mainText = view.findViewById(R.id.stop_main_text);
-    DbHelper helper = ((StopsListActivity)getActivity()).getDbHelper();
+    DbHelper helper = ((StopsListActivity)context).getDbHelper();
     Cursor cursor = helper.query("stops_local",new String[]{"stop_name","direction"},"stop_code = ?",
         new String[]{String.valueOf(stop_id)},null,null,null);
     cursor.moveToFirst();

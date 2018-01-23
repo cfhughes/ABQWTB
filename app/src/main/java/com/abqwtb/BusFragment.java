@@ -1,5 +1,8 @@
 package com.abqwtb;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -72,17 +75,49 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
         @Override
         public void onResponse(String response) {
           //Log.v("Location Response", response);
-          String[] coords = response.split(":");
-          nextStop.setText(String.format("Next Stop: %s", coords[0]));
-          LatLng position = new LatLng(Double.parseDouble(coords[1]), Double.parseDouble(coords[2]));
-          CameraUpdate update = CameraUpdateFactory.newLatLng(position);
-          marker.setPosition(position);
-          map.animateCamera(update);
+          if (response.contains(":")) {
+            String[] coords = response.split(":");
+            nextStop.setText(String.format("Next Stop: %s", coords[0]));
+            LatLng position = new LatLng(Double.parseDouble(coords[1]),
+                Double.parseDouble(coords[2]));
+            CameraUpdate update = CameraUpdateFactory.newLatLng(position);
+            if (marker == null){
+              Bitmap orig = BitmapFactory.decodeResource(getResources(),R.drawable.icon);
+              Bitmap scaled = Bitmap.createScaledBitmap(orig,128,128,false);
+              marker = map.addMarker(new MarkerOptions().position(position).icon(BitmapDescriptorFactory.fromBitmap(scaled))
+                  .title("Bus"));
+            }else {
+              marker.setPosition(position);
+            }
+            map.animateCamera(update);
+          }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("An error occurred while retrieving data, the bus you were tracking may have gone off duty");
+            builder.setTitle("Data Error");
+            builder.setPositiveButton("Ok", new OnClickListener() {
+              @Override
+              public void onClick(DialogInterface dialog, int which) {
+
+              }
+            });
+            AlertDialog alert = builder.create();
+            alert.show();
+          }
         }
       }, new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
+          AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+          builder.setMessage("An error occurred while retrieving data, please check your internet connection.");
+          builder.setTitle("Connection Error");
+          builder.setPositiveButton("Ok", new OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
 
+            }
+          });
+          AlertDialog alert = builder.create();
+          alert.show();
         }
       });
     }
@@ -111,10 +146,6 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
   public void onMapReady(GoogleMap googleMap) {
     map = googleMap;
     LatLng abq = new LatLng(35.088208, -106.649647);
-    Bitmap orig = BitmapFactory.decodeResource(getResources(),R.drawable.icon);
-    Bitmap scaled = Bitmap.createScaledBitmap(orig,128,128,false);
-    marker = googleMap.addMarker(new MarkerOptions().position(abq).icon(BitmapDescriptorFactory.fromBitmap(scaled))
-        .title("Marker in Sydney"));
     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(abq, 14));
     googleMap.setMyLocationEnabled(true);
     queue.add(request);
