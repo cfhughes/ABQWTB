@@ -1,14 +1,16 @@
 package com.abqwtb;
 
+import android.Manifest.permission;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +18,6 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
@@ -31,7 +32,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -74,25 +74,29 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
       request = new StringRequest(Method.GET, url, new Listener<String>() {
         @Override
         public void onResponse(String response) {
-          //Log.v("Location Response", response);
+          if (!isAdded()) {
+            return; //Stop if Fragment isn't in an activity
+          }
           if (response.contains(":")) {
             String[] coords = response.split(":");
             nextStop.setText(String.format("Next Stop: %s", coords[0]));
             LatLng position = new LatLng(Double.parseDouble(coords[1]),
                 Double.parseDouble(coords[2]));
             CameraUpdate update = CameraUpdateFactory.newLatLng(position);
-            if (marker == null){
-              Bitmap orig = BitmapFactory.decodeResource(getResources(),R.drawable.icon);
-              Bitmap scaled = Bitmap.createScaledBitmap(orig,128,128,false);
-              marker = map.addMarker(new MarkerOptions().position(position).icon(BitmapDescriptorFactory.fromBitmap(scaled))
+            if (marker == null) {
+              Bitmap orig = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+              Bitmap scaled = Bitmap.createScaledBitmap(orig, 128, 128, false);
+              marker = map.addMarker(new MarkerOptions().position(position)
+                  .icon(BitmapDescriptorFactory.fromBitmap(scaled))
                   .title("Bus"));
-            }else {
+            } else {
               marker.setPosition(position);
             }
             map.animateCamera(update);
-          }else{
+          } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage("An error occurred while retrieving data, the bus you were tracking may have gone off duty");
+            builder.setMessage(
+                "An error occurred while retrieving data, the bus you were tracking may have gone off duty");
             builder.setTitle("Data Error");
             builder.setPositiveButton("Ok", new OnClickListener() {
               @Override
@@ -107,8 +111,12 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
       }, new ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
+          if (!isAdded()) {
+            return;
+          }
           AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-          builder.setMessage("An error occurred while retrieving data, please check your internet connection.");
+          builder.setMessage(
+              "An error occurred while retrieving data, please check your internet connection.");
           builder.setTitle("Connection Error");
           builder.setPositiveButton("Ok", new OnClickListener() {
             @Override
@@ -135,7 +143,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_bus, container, false);
     SupportMapFragment mapFragment = SupportMapFragment.newInstance();
-    getFragmentManager().beginTransaction().add(R.id.map_container,mapFragment).commit();
+    getFragmentManager().beginTransaction().add(R.id.map_container, mapFragment).commit();
     mapFragment.getMapAsync(this);
     nextStop = (TextView) view.findViewById(R.id.bus_next_stop);
     progressBar = (ProgressBar) view.findViewById(R.id.bus_update_progress);
@@ -144,24 +152,32 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
 
   @Override
   public void onMapReady(GoogleMap googleMap) {
+    if (!isAdded()) {
+      return;
+    }
     map = googleMap;
     LatLng abq = new LatLng(35.088208, -106.649647);
     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(abq, 14));
-    googleMap.setMyLocationEnabled(true);
+    if (ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_FINE_LOCATION)
+        == PackageManager.PERMISSION_GRANTED
+        || ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_COARSE_LOCATION)
+        == PackageManager.PERMISSION_GRANTED) {
+      googleMap.setMyLocationEnabled(true);
+    }
     queue.add(request);
-    progressBarAnimation = new ProgressBarAnimation(progressBar,0,100);
-    progressBarAnimation.setDuration(1000*15);
+    progressBarAnimation = new ProgressBarAnimation(progressBar, 0, 100);
+    progressBarAnimation.setDuration(1000 * 15);
     progressBar.startAnimation(progressBarAnimation);
-    mRunnable = new Runnable(){
+    mRunnable = new Runnable() {
 
       @Override
       public void run() {
         queue.add(request);
-        mHandler.postDelayed(mRunnable,1000*15); // 15 seconds
+        mHandler.postDelayed(mRunnable, 1000 * 15); // 15 seconds
         progressBar.startAnimation(progressBarAnimation);
       }
     };
-    mHandler.postDelayed(mRunnable,1000*15);
+    mHandler.postDelayed(mRunnable, 1000 * 15);
   }
 
   @Override
@@ -183,9 +199,10 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
   }
 
   public class ProgressBarAnimation extends Animation {
+
     private ProgressBar progressBar;
     private float from;
-    private float  to;
+    private float to;
 
     public ProgressBarAnimation(ProgressBar progressBar, float from, float to) {
       super();
