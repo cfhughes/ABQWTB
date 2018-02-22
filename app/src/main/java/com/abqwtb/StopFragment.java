@@ -62,6 +62,7 @@ public class StopFragment extends Fragment {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
     if (getArguments() != null) {
       stop_id = getArguments().getInt(ARG_STOP_ID);
       Log.v("Stop_id",""+stop_id);
@@ -80,7 +81,9 @@ public class StopFragment extends Fragment {
         new Response.Listener<String>() {
           @Override
           public void onResponse(String response) {
-            // Display the first 500 characters of the response string.
+            if (!isAdded()) {
+              return;
+            }
             String[] sched = response.split("\\|");
             BusTrip[] trips = new BusTrip[sched.length];
 
@@ -113,7 +116,10 @@ public class StopFragment extends Fragment {
         }, new Response.ErrorListener() {
       @Override
       public void onErrorResponse(VolleyError error) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        if (!isAdded()) {
+          return;
+        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("An error occurred while retrieving data, please check your internet connection.");
         builder.setTitle("Connection Error");
         builder.setPositiveButton("Ok", new OnClickListener() {

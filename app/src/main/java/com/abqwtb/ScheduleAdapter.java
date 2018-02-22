@@ -3,11 +3,11 @@ package com.abqwtb;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.abqwtb.model.BusTrip;
@@ -15,7 +15,6 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
 public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
@@ -27,7 +26,7 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     public void run() {
       synchronized (lstHolders) {
         long currentTime = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
-        if (currentTime < 10 * 60 * 60 * 1000){
+        if (currentTime < 10 * 60 * 60 * 1000) {
           currentTime += 24 * 60 * 60 * 1000;
         }
         for (ViewHolder holder : lstHolders) {
@@ -61,6 +60,7 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
       viewHolder.scheduleTimer = convertView.findViewById(R.id.schedule_timer);
       viewHolder.delay = convertView.findViewById(R.id.schedule_delay);
       viewHolder.ll = convertView.findViewById(R.id.schedule_routes_layout);
+      viewHolder.arrow = convertView.findViewById(R.id.bus_schedule_arrow);
       convertView.setTag(viewHolder);
       synchronized (lstHolders) {
         lstHolders.add(viewHolder);
@@ -77,7 +77,8 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     mHandler.removeCallbacks(updateRemainingTimeRunnable);
   }
 
-  public class ViewHolder{
+  public class ViewHolder {
+
     BusTrip trip;
 
     TextView scheduleTime;
@@ -85,8 +86,9 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     TextView delay;
     LinearLayout ll;
     Calendar scheduled;
+    ImageView arrow;
 
-    public void setData(BusTrip data){
+    public void setData(BusTrip data) {
       trip = data;
       if (trip.scheduledTime != -1) {
         scheduled = Calendar.getInstance();
@@ -99,12 +101,10 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
         long now = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
         //Add 24 hours for past midnight service
-        if (now < 10 * 60 * 60 * 1000){
+        if (now < 10 * 60 * 60 * 1000) {
           now += 24 * 60 * 60 * 1000;
         }
         updateTime(now);
-
-
 
         RouteIcon icon = RouteIcon.routeIcons.get(trip.route);
         ll.removeAllViews();
@@ -112,28 +112,38 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
           ll.addView(icon.getView(getContext(), ll));
         }
 
+        if (trip.busId > 0) {
+          arrow.setVisibility(View.VISIBLE);
+        } else {
+          arrow.setVisibility(View.INVISIBLE);
+        }
+
         //Log.v("Late", ""+trip.secondsLate);
-        if (trip.secondsLate > 0){
-          delay.setTextColor(Color.argb(200,255,0,0));
+        if (trip.secondsLate > 0) {
+          delay.setTextColor(Color.argb(200, 255, 0, 0));
           delay.setText(String.format("+%.1f", trip.secondsLate / 60));
-        }else if(trip.secondsLate < -1){
-          delay.setTextColor(Color.argb(200,255,150,0));
+        } else if (trip.secondsLate < -1) {
+          delay.setTextColor(Color.argb(200, 255, 150, 0));
           delay.setText(String.format("-%.1f", Math.abs(trip.secondsLate / 60)));
-        }else if(trip.secondsLate == 0) {
-          delay.setTextColor(Color.argb(200,0,255,0));
-          delay.setText("On Time");
-        }else{
+        } else if (trip.secondsLate == 0) {
+          delay.setTextColor(Color.argb(200, 0, 255, 0));
+          delay.setText(getContext().getString(R.string.on_time));
+        } else {
           delay.setText("");
         }
-      }else{
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) scheduleTimer.getLayoutParams();
+      } else {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) scheduleTimer
+            .getLayoutParams();
         params.weight = 10.0f;
         scheduleTimer.setText(getContext().getString(R.string.no_more_busses));
+        arrow.setVisibility(View.INVISIBLE);
+        scheduleTime.setText("");
+        delay.setText("");
       }
 
     }
 
-    public void updateTime(long now){
+    public void updateTime(long now) {
       if (trip.scheduledTime != -1) {
         long diff = scheduled.getTimeInMillis() - now;
         //Log.i("diff",""+scheduled.getTimeInMillis()+ " - " + now + " = " + diff);

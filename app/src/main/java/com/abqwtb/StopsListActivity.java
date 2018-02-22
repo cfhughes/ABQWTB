@@ -1,41 +1,21 @@
 package com.abqwtb;
 
-import android.Manifest.permission;
-import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.location.Location;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.StrictMode;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.FrameLayout;
-import android.widget.ListView;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import java.io.IOException;
-import java.net.URI;
 
 public class StopsListActivity extends AppCompatActivity {
 
   private DbHelper dbHelper;
-  private FrameLayout frameLayout;
+  private DrawerLayout mDrawerLayout;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +35,15 @@ public class StopsListActivity extends AppCompatActivity {
     //End Strict mode code
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_stops_list);
-    frameLayout = findViewById(R.id.main_container);
+
+    mDrawerLayout = findViewById(R.id.drawer_layout);
+
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    ActionBar actionbar = getSupportActionBar();
+    actionbar.setDisplayHomeAsUpEnabled(true);
+    actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+
 
     getDbHelper();
     if (savedInstanceState == null) {
@@ -78,7 +66,9 @@ public class StopsListActivity extends AppCompatActivity {
   }
 
   public synchronized DbHelper getDbHelper() {
-    dbCreate();
+    if (dbHelper == null) {
+      dbCreate();
+    }
     return dbHelper;
   }
 
@@ -104,5 +94,15 @@ public class StopsListActivity extends AppCompatActivity {
 
       return null;
     }
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        mDrawerLayout.openDrawer(GravityCompat.START);
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
   }
 }
