@@ -35,4 +35,21 @@ public class RouteIcon {
 
     return icon;
   }
+
+  public int getStopColor() {
+    return stopColor;
+  }
+
+  public int getTextColor() {
+    return textColor;
+  }
+
+  public int getRoute() {
+    return route;
+  }
+
+  @Override
+  public String toString() {
+    return String.valueOf(route);
+  }
 }

@@ -5,17 +5,23 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AutoCompleteTextView;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class StopsListActivity extends AppCompatActivity {
 
   private DbHelper dbHelper;
   private DrawerLayout mDrawerLayout;
+  private AutoCompleteTextView routesSpinner;
+  private RouteSpinnerAdapter adapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +84,28 @@ public class StopsListActivity extends AppCompatActivity {
     super.onDestroy();
   }
 
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.appbar_menu, menu);
+
+    MenuItem item = menu.findItem(R.id.spinner);
+    routesSpinner = (AutoCompleteTextView) MenuItemCompat.getActionView(item);
+
+    routesSpinner.setAdapter(adapter);
+
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    switch (item.getItemId()) {
+      case android.R.id.home:
+        mDrawerLayout.openDrawer(GravityCompat.START);
+        return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
+
   public class LoadIcons extends AsyncTask<Object, Object, Object> {
 
     @Override
@@ -92,17 +120,12 @@ public class StopsListActivity extends AppCompatActivity {
       routes.close();
       //dbHelper.close();
 
+      adapter = new RouteSpinnerAdapter(StopsListActivity.this,
+          android.R.layout.simple_spinner_item,
+          new ArrayList<RouteIcon>(RouteIcon.routeIcons.values()));
+      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
       return null;
     }
-  }
-
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    switch (item.getItemId()) {
-      case android.R.id.home:
-        mDrawerLayout.openDrawer(GravityCompat.START);
-        return true;
-    }
-    return super.onOptionsItemSelected(item);
   }
 }
