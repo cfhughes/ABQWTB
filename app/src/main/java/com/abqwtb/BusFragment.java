@@ -198,6 +198,11 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
     mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
+  public void onStart() {
+    super.onStart();
+    ((StopsListActivity) getActivity()).setIsTopLevel(false);
+  }
+
   public class ProgressBarAnimation extends Animation {
 
     private ProgressBar progressBar;

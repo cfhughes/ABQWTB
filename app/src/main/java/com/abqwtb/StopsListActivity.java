@@ -4,24 +4,29 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.design.widget.NavigationView.OnNavigationItemSelectedListener;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
+import com.abqwtb.SearchDialog.SearchDialogListener;
 import java.io.IOException;
-import java.util.ArrayList;
 
-public class StopsListActivity extends AppCompatActivity {
+public class StopsListActivity extends AppCompatActivity implements SearchDialogListener,
+    OnNavigationItemSelectedListener {
 
+  private ActionBar actionbar;
   private DbHelper dbHelper;
   private DrawerLayout mDrawerLayout;
-  private AutoCompleteTextView routesSpinner;
-  private RouteSpinnerAdapter adapter;
+  private boolean topLevel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +49,14 @@ public class StopsListActivity extends AppCompatActivity {
 
     mDrawerLayout = findViewById(R.id.drawer_layout);
 
+    NavigationView navigationView = findViewById(R.id.nav_view);
+    navigationView.setNavigationItemSelectedListener(this);
+
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
-    ActionBar actionbar = getSupportActionBar();
+    actionbar = getSupportActionBar();
     actionbar.setDisplayHomeAsUpEnabled(true);
-    actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
-
+    setIsTopLevel(true);
 
     getDbHelper();
     if (savedInstanceState == null) {
@@ -59,6 +66,17 @@ public class StopsListActivity extends AppCompatActivity {
 
     new LoadIcons().execute();
 
+  }
+
+  public void setIsTopLevel(boolean topLevel) {
+    if (this.topLevel != topLevel) {
+      this.topLevel = topLevel;
+      if (topLevel) {
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_menu);
+      } else {
+        actionbar.setHomeAsUpIndicator(R.drawable.back_arrow);
+      }
+    }
   }
 
   private void dbCreate() {
@@ -88,11 +106,6 @@ public class StopsListActivity extends AppCompatActivity {
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.appbar_menu, menu);
 
-    MenuItem item = menu.findItem(R.id.spinner);
-    routesSpinner = (AutoCompleteTextView) MenuItemCompat.getActionView(item);
-
-    routesSpinner.setAdapter(adapter);
-
     return true;
   }
 
@@ -100,10 +113,39 @@ public class StopsListActivity extends AppCompatActivity {
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
       case android.R.id.home:
-        mDrawerLayout.openDrawer(GravityCompat.START);
+        if (topLevel) {
+          mDrawerLayout.openDrawer(GravityCompat.START);
+        } else {
+          getSupportFragmentManager().popBackStack();
+        }
         return true;
+      case R.id.search:
+        new SearchDialog().show(getSupportFragmentManager(), "search");
+        break;
     }
     return super.onOptionsItemSelected(item);
+  }
+
+  @Override
+  public void onSearch(DialogFragment dialog) {
+    EditText stopId = dialog.getDialog().findViewById(R.id.stop_id_search);
+    Log.v("Search", stopId.getText().toString());
+  }
+
+  @Override
+  public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    switch (item.getItemId()) {
+      case R.id.nav_nearest:
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.main_container, new StopsListFragment()).commit();
+        break;
+      case R.id.nav_favorites:
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.main_container, new FavoriteStopsFragment()).commit();
+        break;
+    }
+    mDrawerLayout.closeDrawers();
+    return true;
   }
 
   public class LoadIcons extends AsyncTask<Object, Object, Object> {
@@ -120,10 +162,10 @@ public class StopsListActivity extends AppCompatActivity {
       routes.close();
       //dbHelper.close();
 
-      adapter = new RouteSpinnerAdapter(StopsListActivity.this,
+      /*adapter = new RouteSpinnerAdapter(StopsListActivity.this,
           android.R.layout.simple_spinner_item,
           new ArrayList<RouteIcon>(RouteIcon.routeIcons.values()));
-      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);*/
 
       return null;
     }

@@ -14,6 +14,9 @@ public class ABQBusApplication extends Application {
     super.onCreate();
 
     sAnalytics = GoogleAnalytics.getInstance(this);
+
+//    Stetho.initializeWithDefaults(this);
+
   }
 
   /**

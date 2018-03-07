@@ -9,6 +9,7 @@
   <string name="navigation_drawer_close">Close navigation drawer</string>
 
   <string name="action_settings">Settings</string>
+  <string name="favorite_stops_key">fav_stops</string>
 
   <string-array name="routes">
     <item>66</item>

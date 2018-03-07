@@ -260,5 +260,9 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
     }
   }
 
-
+  @Override
+  public void onStart() {
+    super.onStart();
+    ((StopsListActivity) getActivity()).setIsTopLevel(true);
+  }
 }

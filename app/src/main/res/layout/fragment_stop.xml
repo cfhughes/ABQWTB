@@ -5,13 +5,30 @@
   tools:context="com.abqwtb.StopFragment"
   android:orientation="vertical">
 
-  <TextView
-    android:paddingLeft="10dp"
-    android:id="@+id/stop_main_text"
+  <LinearLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:textSize="18sp"
-    android:text=""/>
+    android:orientation="horizontal">
+
+    <TextView
+      android:id="@+id/stop_main_text"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:paddingLeft="10dp"
+      android:text=""
+      android:textSize="18sp"/>
+
+    <ImageView
+      android:id="@+id/stop_favorite_star"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="Favorite"
+      android:src="@drawable/ic_star_border"/>
+
+
+  </LinearLayout>
+
 
   <ListView
     android:id="@+id/schedule"
