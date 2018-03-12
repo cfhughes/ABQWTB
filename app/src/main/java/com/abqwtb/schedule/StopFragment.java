@@ -1,4 +1,4 @@
-package com.abqwtb;
+package com.abqwtb.schedule;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,8 +19,13 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import com.abqwtb.ScheduleAdapter.ViewHolder;
+import com.abqwtb.ABQBusApplication;
+import com.abqwtb.DbHelper;
+import com.abqwtb.R;
+import com.abqwtb.StopsListActivity;
+import com.abqwtb.bus.BusFragment;
 import com.abqwtb.model.BusTrip;
+import com.abqwtb.schedule.ScheduleAdapter.ViewHolder;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -49,6 +54,7 @@ public class StopFragment extends Fragment {
   private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
   private Runnable mRunnable;
   private Context context;
+  private boolean favorite;
 
 
   public StopFragment() {
@@ -175,6 +181,7 @@ public class StopFragment extends Fragment {
         .getStringSet(getString(R.string.favorite_stops_key), null);
     if (savedStops != null) {
       if (savedStops.contains(String.valueOf(stop_id))) {
+        favorite = true;
         star.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(),
             R.drawable.ic_star));
       }
@@ -183,17 +190,27 @@ public class StopFragment extends Fragment {
     star.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        star.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(),
-            R.drawable.ic_star));
-        SharedPreferences.Editor editor = sharedPref.edit();
-        Set<String> saved = savedStops;
-        if (saved == null) {
-          saved = new HashSet<>();
+        if (favorite) {
+          star.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(),
+              R.drawable.ic_star_border));
+          SharedPreferences.Editor editor = sharedPref.edit();
+          savedStops.remove(String.valueOf(stop_id));
+          editor.clear();
+          editor.putStringSet(getString(R.string.favorite_stops_key), savedStops);
+          editor.apply();
+        } else {
+          star.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(),
+              R.drawable.ic_star));
+          SharedPreferences.Editor editor = sharedPref.edit();
+          Set<String> saved = savedStops;
+          if (saved == null) {
+            saved = new HashSet<>();
+          }
+          saved.add(String.valueOf(stop_id));
+          editor.clear();
+          editor.putStringSet(getString(R.string.favorite_stops_key), saved);
+          editor.apply();
         }
-        saved.add(String.valueOf(stop_id));
-        editor.clear();
-        editor.putStringSet(getString(R.string.favorite_stops_key), saved);
-        editor.apply();
       }
     });
 

@@ -1,4 +1,4 @@
-package com.abqwtb;
+package com.abqwtb.stops;
 
 
 import android.Manifest;
@@ -23,6 +23,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import com.abqwtb.ABQBusApplication;
+import com.abqwtb.DbHelper;
+import com.abqwtb.R;
+import com.abqwtb.StopsListActivity;
+import com.abqwtb.StopsProvider;
+import com.abqwtb.schedule.StopFragment;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.location.FusedLocationProviderClient;

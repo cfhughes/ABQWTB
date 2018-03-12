@@ -1,7 +1,10 @@
 package com.abqwtb;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,11 +16,14 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 import com.abqwtb.SearchDialog.SearchDialogListener;
+import com.abqwtb.stops.FavoriteStopsFragment;
+import com.abqwtb.stops.SearchStopsFragment;
+import com.abqwtb.stops.StopsListFragment;
 import java.io.IOException;
 
 public class StopsListActivity extends AppCompatActivity implements SearchDialogListener,
@@ -27,6 +33,8 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   private DbHelper dbHelper;
   private DrawerLayout mDrawerLayout;
   private boolean topLevel;
+  private MenuItem search_menu_item;
+  private SearchStopsFragment searchStopsFragment;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +87,10 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     }
   }
 
+  public void setSearchVisible(boolean searchVisible) {
+    search_menu_item.setVisible(searchVisible);
+  }
+
   private void dbCreate() {
     dbHelper = new DbHelper(this);
     try {
@@ -105,7 +117,8 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {
     getMenuInflater().inflate(R.menu.appbar_menu, menu);
-
+    search_menu_item = menu.findItem(R.id.search);
+    setSearchVisible(false);
     return true;
   }
 
@@ -128,8 +141,35 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
 
   @Override
   public void onSearch(DialogFragment dialog) {
-    EditText stopId = dialog.getDialog().findViewById(R.id.stop_id_search);
-    Log.v("Search", stopId.getText().toString());
+    if (searchStopsFragment != null && searchStopsFragment.isVisible()) {
+      String stopId = ((EditText) dialog.getDialog().findViewById(R.id.stop_id_search)).getText()
+          .toString().trim();
+      String routeNum = ((EditText) dialog.getDialog().findViewById(R.id.route_number_search))
+          .getText().toString().trim();
+      String stopName = ((EditText) dialog.getDialog().findViewById(R.id.stop_name_search))
+          .getText().toString().trim();
+      int stopIdInt;
+      int routeNumInt;
+      try {
+        if (stopId.isEmpty()) {
+          stopIdInt = -1;
+        } else {
+          stopIdInt = Integer.parseInt(stopId);
+        }
+        if (routeNum.isEmpty()) {
+          routeNumInt = -1;
+        } else {
+          routeNumInt = Integer.parseInt(routeNum);
+        }
+      } catch (NumberFormatException e) {
+        e.printStackTrace();
+        Toast.makeText(this, "Invalid Entry", Toast.LENGTH_SHORT).show();
+        return;
+      }
+      if (searchStopsFragment != null && searchStopsFragment.isVisible()) {
+        searchStopsFragment.onSearch(stopIdInt, routeNumInt, stopName);
+      }
+    }
   }
 
   @Override
@@ -143,6 +183,26 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
         getSupportFragmentManager().beginTransaction()
             .replace(R.id.main_container, new FavoriteStopsFragment()).commit();
         break;
+      case R.id.nav_search:
+        searchStopsFragment = new SearchStopsFragment();
+        getSupportFragmentManager().beginTransaction()
+            .replace(R.id.main_container, searchStopsFragment).commit();
+        break;
+      case R.id.nav_feedback:
+        Uri uri = Uri.parse("market://details?id=" + getPackageName());
+        Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+        // To count with Play market backstack, After pressing back button,
+        // to taken back to our application, we need to add following flags to intent.
+        goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+            Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+            Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+        try {
+          startActivity(goToMarket);
+        } catch (ActivityNotFoundException e) {
+          startActivity(new Intent(Intent.ACTION_VIEW,
+              Uri.parse("http://play.google.com/store/apps/details?id=" + getPackageName())));
+        }
+        break;
     }
     mDrawerLayout.closeDrawers();
     return true;
@@ -154,10 +214,14 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     protected Object doInBackground(Object... objects) {
       getDbHelper();
 
-      Cursor routes = dbHelper.query("routes",new String[]{"route_short_name","route_color","route_text_color"},null,null,null,null,null);
-      while (routes.moveToNext()){
-        RouteIcon.routeIcons.put(Integer.parseInt(routes.getString(0).trim()),new RouteIcon(Integer.parseInt(routes.getString(0).trim()),
-            Color.parseColor("#"+routes.getString(1)),Color.parseColor("#"+routes.getString(2))));
+      Cursor routes = dbHelper
+          .query("routes", new String[]{"route_short_name", "route_color", "route_text_color"},
+              null, null, null, null, null);
+      while (routes.moveToNext()) {
+        RouteIcon.routeIcons.put(Integer.parseInt(routes.getString(0).trim()),
+            new RouteIcon(Integer.parseInt(routes.getString(0).trim()),
+                Color.parseColor("#" + routes.getString(1)),
+                Color.parseColor("#" + routes.getString(2))));
       }
       routes.close();
       //dbHelper.close();

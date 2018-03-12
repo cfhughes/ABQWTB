@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import java.io.IOException;
 
 public class StopsProvider extends ContentProvider {
 
@@ -36,7 +35,7 @@ public class StopsProvider extends ContentProvider {
     db = mOpenHelper.getReadableDatabase();
     Cursor result = null;
     try{
-      result = db.query("stops_local",columns,selection,args,null,null,sortOrder);
+      result = db.query("stops_local", columns, selection, args, null, null, sortOrder, "300");
     }catch(SQLException e){
       e.printStackTrace();
     }
