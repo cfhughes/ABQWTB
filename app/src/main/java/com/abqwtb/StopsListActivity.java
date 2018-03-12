@@ -35,6 +35,7 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   private boolean topLevel;
   private MenuItem search_menu_item;
   private SearchStopsFragment searchStopsFragment;
+  private SearchDialog searchDialog;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +74,8 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     }
 
     new LoadIcons().execute();
+
+    searchDialog = new SearchDialog();
 
   }
 
@@ -133,7 +136,7 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
         }
         return true;
       case R.id.search:
-        new SearchDialog().show(getSupportFragmentManager(), "search");
+        searchDialog.show(getSupportFragmentManager(), "search");
         break;
     }
     return super.onOptionsItemSelected(item);
