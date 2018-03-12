@@ -13,5 +13,5 @@
   </group>
   <item
     android:id="@+id/nav_feedback"
-    android:title="Leave Feedback"/>
+    android:title="Leave A Review In Google Play"/>
 </menu>
