@@ -1,17 +1,15 @@
-package com.abqwtb;
+package com.abqwtb.stops;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
-import java.util.List;
+import com.abqwtb.R;
+import com.abqwtb.RouteIcon;
 
 public class StopsAdapter extends CursorAdapter {
 

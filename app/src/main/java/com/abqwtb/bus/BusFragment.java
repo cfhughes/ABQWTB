@@ -1,4 +1,4 @@
-package com.abqwtb;
+package com.abqwtb.bus;
 
 import android.Manifest.permission;
 import android.app.AlertDialog;
@@ -18,6 +18,9 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import com.abqwtb.ABQBusApplication;
+import com.abqwtb.R;
+import com.abqwtb.StopsListActivity;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
@@ -57,7 +60,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
     // Required empty public constructor
   }
 
-  static BusFragment newInstance(int bus_id) {
+  public static BusFragment newInstance(int bus_id) {
     BusFragment fragment = new BusFragment();
     Bundle args = new Bundle();
     args.putInt(ARG_BUS_ID, bus_id);

@@ -1,33 +1,39 @@
-package com.abqwtb;
+package com.abqwtb.stops;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import com.abqwtb.ABQBusApplication;
+import com.abqwtb.R;
+import com.abqwtb.StopsListActivity;
+import com.abqwtb.StopsProvider;
+import com.abqwtb.schedule.StopFragment;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import java.util.Collections;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
-public class FavoriteStopsFragment extends Fragment implements
+public class SearchStopsFragment extends Fragment implements
     LoaderManager.LoaderCallbacks<Cursor> {
 
   private StopsAdapter cursorAdapter;
   private Tracker mTracker;
+  private int stopId = -1;
+  private int routeNum = -1;
+  private String stopName = "";
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,7 +42,7 @@ public class FavoriteStopsFragment extends Fragment implements
     cursorAdapter =
         new StopsAdapter(getActivity(), null, false);
 
-    //getActivity().getSupportLoaderManager().initLoader(1, null, this);
+    //getActivity().getSupportLoaderManager().initLoader(2, null, this);
 
     ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
     mTracker = application.getDefaultTracker();
@@ -70,37 +76,44 @@ public class FavoriteStopsFragment extends Fragment implements
   @Override
   public void onResume() {
     super.onResume();
-    getActivity().getSupportLoaderManager().restartLoader(1, null, FavoriteStopsFragment.this);
-    mTracker.setScreenName("ABQBus Favorite Stops");
+    getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
+    mTracker.setScreenName("ABQBus Search Stops");
     mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
+  @NonNull
   @Override
   public Loader<Cursor> onCreateLoader(int id, Bundle args) {
     Uri uri = StopsProvider.CONTENT_URI;
-    SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
-    Set<String> savedStops = sharedPref
-        .getStringSet(getString(R.string.favorite_stops_key), null);
-    if (savedStops != null && savedStops.size() > 0) {
-      Log.v("STOPS", savedStops.toString());
-      return new CursorLoader(getActivity(), uri, new String[]{"stop_code _id", "stop_name",
-          "(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)",
-          "direction"}, "`stop_code` IN (" +
-          TextUtils.join(",", Collections.nCopies(savedStops.size(), "?")) + ")",
-          savedStops.toArray(new String[savedStops.size()]),
-          null);
-    } else {
-      return null;
+    List<String> queryString = new ArrayList<>();
+    List<Object> params = new ArrayList<>();
+    if (stopId != -1) {
+      queryString.add("stop_code = ?");
+      params.add(String.valueOf(stopId));
     }
+    if (routeNum != -1) {
+      queryString.add("',' || routes || ',' LIKE ?");
+      params.add("%," + routeNum + ",%");
+    }
+    if (stopName != null && stopName.length() > 0) {
+      queryString.add("stop_name LIKE ?");
+      params.add("%" + stopName.replace(' ', '%') + "%");
+    }
+    return new CursorLoader(getActivity(), uri, new String[]{"stop_code _id", "stop_name",
+        "(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code) routes",
+        "direction"}, TextUtils.join(" AND ", queryString),
+        params.toArray(new String[params.size()]),
+        "stop_lon");
+
   }
 
   @Override
-  public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+  public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
     cursorAdapter.swapCursor(data);
   }
 
   @Override
-  public void onLoaderReset(Loader<Cursor> loader) {
+  public void onLoaderReset(@NonNull Loader<Cursor> loader) {
     cursorAdapter.swapCursor(null);
   }
 
@@ -108,5 +121,20 @@ public class FavoriteStopsFragment extends Fragment implements
   public void onStart() {
     super.onStart();
     ((StopsListActivity) getActivity()).setIsTopLevel(true);
+    ((StopsListActivity) getActivity()).setSearchVisible(true);
+  }
+
+  @Override
+  public void onStop() {
+    super.onStop();
+    ((StopsListActivity) getActivity()).setSearchVisible(false);
+  }
+
+  public void onSearch(int stopId, int routeNum, String stopName) {
+    this.stopId = stopId;
+    this.routeNum = routeNum;
+    this.stopName = stopName;
+    getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
+
   }
 }

@@ -1,4 +1,4 @@
-package com.abqwtb;
+package com.abqwtb.schedule;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.abqwtb.R;
+import com.abqwtb.RouteIcon;
 import com.abqwtb.model.BusTrip;
 import java.text.DateFormat;
 import java.util.ArrayList;
