@@ -13,10 +13,11 @@ import android.widget.TextView;
 import com.abqwtb.R;
 import com.abqwtb.RouteIcon;
 import com.abqwtb.model.BusTrip;
-import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
+import org.joda.time.DateTimeZone;
+import org.joda.time.DurationFieldType;
+import org.joda.time.LocalTime;
 
 public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
@@ -27,12 +28,10 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     @Override
     public void run() {
       synchronized (lstHolders) {
-        long currentTime = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
-        if (currentTime < 10 * 60 * 60 * 1000) {
-          currentTime += 24 * 60 * 60 * 1000;
-        }
+        LocalTime nowc = LocalTime.now(DateTimeZone.forID("America/Denver"));
+        long now = nowc.getMillisOfDay();
         for (ViewHolder holder : lstHolders) {
-          holder.updateTime(currentTime);
+          holder.updateTime(now);
         }
         //Log.v("Timer","Update Time");
         mHandler.postDelayed(updateRemainingTimeRunnable, 1000);
@@ -87,25 +86,20 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     TextView scheduleTimer;
     TextView delay;
     LinearLayout ll;
-    Calendar scheduled;
+    LocalTime expectedTime;
     ImageView arrow;
 
     public void setData(BusTrip data) {
       trip = data;
-      if (trip.scheduledTime != -1) {
-        scheduled = Calendar.getInstance();
+      if (trip.scheduledTime != null) {
 
-        scheduled.setTimeInMillis(trip.scheduledTime);
+        scheduleTime.setText(trip.toString());
 
-        scheduleTime.setText(DateFormat.getTimeInstance().format(scheduled.getTime()));
+        expectedTime = trip.scheduledTime.withFieldAdded(DurationFieldType.seconds(),
+            Math.round(trip.secondsLate));
 
-        scheduled.add(Calendar.SECOND, Math.round(trip.secondsLate));
-
-        long now = System.currentTimeMillis() % (24 * 60 * 60 * 1000);
-        //Add 24 hours for past midnight service
-        if (now < 10 * 60 * 60 * 1000) {
-          now += 24 * 60 * 60 * 1000;
-        }
+        LocalTime nowc = LocalTime.now(DateTimeZone.forID("America/Denver"));
+        long now = nowc.getMillisOfDay();
         updateTime(now);
 
         RouteIcon icon = RouteIcon.routeIcons.get(trip.route);
@@ -146,9 +140,13 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     }
 
     public void updateTime(long now) {
-      if (trip.scheduledTime != -1) {
-        long diff = scheduled.getTimeInMillis() - now;
+      if (trip.scheduledTime != null) {
+        long diff = expectedTime.getMillisOfDay() - now;
         //Log.i("diff",""+scheduled.getTimeInMillis()+ " - " + now + " = " + diff);
+        //Compensate for after midnight times
+        if (diff < -12 * 60 * 60 * 1000) {
+          diff -= 24 * 60 * 60 * 1000;
+        }
         if (diff < 0) {
           diff = 0;
         }
