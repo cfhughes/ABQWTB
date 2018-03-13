@@ -37,6 +37,8 @@ import com.google.android.gms.analytics.Tracker;
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 
 public class StopFragment extends Fragment {
 
@@ -102,9 +104,8 @@ public class StopFragment extends Fragment {
               String[] item = sched[i].split(";");
               try {
                 trips[i] = new BusTrip();
-                String[] time = item[0].split(":");
-                trips[i].scheduledTime = (7 * 60 * 60 + Integer.valueOf(time[0]) * 60 * 60
-                    + Integer.valueOf(time[1]) * 60 + Integer.valueOf(time[2])) * 1000;
+                DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm:ss");
+                trips[i].scheduledTime = fmt.parseLocalTime(item[0]);
                 trips[i].route = Integer.parseInt(item[1]);
                 trips[i].secondsLate = Float.parseFloat(item[2]);
                 trips[i].busId = Integer.parseInt(item[3].trim());

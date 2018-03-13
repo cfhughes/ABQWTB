@@ -3,6 +3,7 @@ package com.abqwtb;
 import android.app.Application;
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
+import net.danlew.android.joda.JodaTimeAndroid;
 
 public class ABQBusApplication extends Application {
 
@@ -16,7 +17,7 @@ public class ABQBusApplication extends Application {
     sAnalytics = GoogleAnalytics.getInstance(this);
 
 //    Stetho.initializeWithDefaults(this);
-
+    JodaTimeAndroid.init(this);
   }
 
   /**
