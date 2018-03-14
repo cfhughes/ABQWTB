@@ -199,6 +199,7 @@ public class StopFragment extends Fragment {
           editor.clear();
           editor.putStringSet(getString(R.string.favorite_stops_key), savedStops);
           editor.apply();
+          favorite = false;
         } else {
           star.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(),
               R.drawable.ic_star));
@@ -211,6 +212,7 @@ public class StopFragment extends Fragment {
           editor.clear();
           editor.putStringSet(getString(R.string.favorite_stops_key), saved);
           editor.apply();
+          favorite = true;
         }
       }
     });
