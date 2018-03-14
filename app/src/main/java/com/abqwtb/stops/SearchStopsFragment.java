@@ -11,6 +11,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -38,6 +40,8 @@ public class SearchStopsFragment extends Fragment implements
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+
+    setHasOptionsMenu(true);
 
     cursorAdapter =
         new StopsAdapter(getActivity(), null, false);
@@ -121,13 +125,7 @@ public class SearchStopsFragment extends Fragment implements
   public void onStart() {
     super.onStart();
     ((StopsListActivity) getActivity()).setIsTopLevel(true);
-    ((StopsListActivity) getActivity()).setSearchVisible(true);
-  }
-
-  @Override
-  public void onStop() {
-    super.onStop();
-    ((StopsListActivity) getActivity()).setSearchVisible(false);
+    //((StopsListActivity) getActivity()).setSearchVisible(true);
   }
 
   public void onSearch(int stopId, int routeNum, String stopName) {
@@ -136,5 +134,11 @@ public class SearchStopsFragment extends Fragment implements
     this.stopName = stopName;
     getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
 
+  }
+
+  @Override
+  public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    inflater.inflate(R.menu.appbar_menu, menu);
+    super.onCreateOptionsMenu(menu, inflater);
   }
 }

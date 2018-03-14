@@ -81,6 +81,8 @@ public class FavoriteStopsFragment extends Fragment implements
         .getStringSet(getString(R.string.favorite_stops_key), null);
     if (savedStops != null && savedStops.size() > 0) {
       getActivity().getSupportLoaderManager().restartLoader(1, null, FavoriteStopsFragment.this);
+    } else {
+      getActivity().getSupportLoaderManager().destroyLoader(1);
     }
     mTracker.setScreenName("ABQBus Favorite Stops");
     mTracker.send(new HitBuilders.ScreenViewBuilder().build());
@@ -112,5 +114,6 @@ public class FavoriteStopsFragment extends Fragment implements
   public void onStart() {
     super.onStart();
     ((StopsListActivity) getActivity()).setIsTopLevel(true);
+    //((StopsListActivity) getActivity()).setSearchVisible(false);
   }
 }
