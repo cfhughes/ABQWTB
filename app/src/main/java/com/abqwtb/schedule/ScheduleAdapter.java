@@ -144,8 +144,8 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
         long diff = expectedTime.getMillisOfDay() - now;
         //Log.i("diff",""+scheduled.getTimeInMillis()+ " - " + now + " = " + diff);
         //Compensate for after midnight times
-        if (diff < -12 * 60 * 60 * 1000) {
-          diff -= 24 * 60 * 60 * 1000;
+        if (diff < -7 * 60 * 60 * 1000) {
+          diff += 24 * 60 * 60 * 1000;
         }
         if (diff < 0) {
           diff = 0;

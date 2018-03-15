@@ -57,6 +57,7 @@ public class StopFragment extends Fragment {
   private Runnable mRunnable;
   private Context context;
   private boolean favorite;
+  private Set<String> savedStops;
 
 
   public StopFragment() {
@@ -105,6 +106,11 @@ public class StopFragment extends Fragment {
               try {
                 trips[i] = new BusTrip();
                 DateTimeFormatter fmt = DateTimeFormat.forPattern("HH:mm:ss");
+                // testing: item[0] = "25:45:56";
+                int hour = Integer.parseInt(item[0].split(":")[0]);
+                if (hour > 23) {
+                  item[0] = (hour - 24) + item[0].substring(2);
+                }
                 trips[i].scheduledTime = fmt.parseLocalTime(item[0]);
                 trips[i].route = Integer.parseInt(item[1]);
                 trips[i].secondsLate = Float.parseFloat(item[2]);
@@ -178,7 +184,7 @@ public class StopFragment extends Fragment {
 
     final SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
 
-    final Set<String> savedStops = sharedPref
+    savedStops = sharedPref
         .getStringSet(getString(R.string.favorite_stops_key), null);
     if (savedStops != null) {
       if (savedStops.contains(String.valueOf(stop_id))) {
@@ -204,13 +210,12 @@ public class StopFragment extends Fragment {
           star.setImageDrawable(ContextCompat.getDrawable(getActivity().getApplicationContext(),
               R.drawable.ic_star));
           SharedPreferences.Editor editor = sharedPref.edit();
-          Set<String> saved = savedStops;
-          if (saved == null) {
-            saved = new HashSet<>();
+          if (savedStops == null) {
+            savedStops = new HashSet<>();
           }
-          saved.add(String.valueOf(stop_id));
+          savedStops.add(String.valueOf(stop_id));
           editor.clear();
-          editor.putStringSet(getString(R.string.favorite_stops_key), saved);
+          editor.putStringSet(getString(R.string.favorite_stops_key), savedStops);
           editor.apply();
           favorite = true;
         }

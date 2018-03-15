@@ -1,5 +1,9 @@
 package com.abqwtb.stops;
 
+import static com.abqwtb.StopsListActivity.ROUTE_NUM;
+import static com.abqwtb.StopsListActivity.STOP_ID;
+import static com.abqwtb.StopsListActivity.STOP_NAME;
+
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -77,12 +81,17 @@ public class SearchStopsFragment extends Fragment implements
 
   }
 
-  @Override
-  public void onResume() {
-    super.onResume();
-    getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
-    mTracker.setScreenName("ABQBus Search Stops");
-    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+  public static SearchStopsFragment newInstance(int stopId, int routeNum, String stopName) {
+
+    Bundle args = new Bundle();
+
+    args.putInt(STOP_ID, stopId);
+    args.putInt(ROUTE_NUM, routeNum);
+    args.putString(STOP_NAME, stopName);
+
+    SearchStopsFragment fragment = new SearchStopsFragment();
+    fragment.setArguments(args);
+    return fragment;
   }
 
   @NonNull
@@ -128,17 +137,35 @@ public class SearchStopsFragment extends Fragment implements
     //((StopsListActivity) getActivity()).setSearchVisible(true);
   }
 
-  public void onSearch(int stopId, int routeNum, String stopName) {
-    this.stopId = stopId;
-    this.routeNum = routeNum;
-    this.stopName = stopName;
+  @Override
+  public void onResume() {
+    super.onResume();
+    if (getArguments() != null) {
+      stopId = getArguments().getInt(STOP_ID);
+      routeNum = getArguments().getInt(ROUTE_NUM);
+      stopName = getArguments().getString(STOP_NAME);
+    }
     getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
-
+    mTracker.setScreenName("ABQBus Search Stops");
+    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
   @Override
   public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     inflater.inflate(R.menu.appbar_menu, menu);
     super.onCreateOptionsMenu(menu, inflater);
+  }
+
+  public void onSearch(int stopId, int routeNum, String stopName) {
+    this.stopId = stopId;
+    this.routeNum = routeNum;
+    this.stopName = stopName;
+    Bundle args = getArguments();
+    args.putInt(STOP_ID, stopId);
+    args.putInt(ROUTE_NUM, routeNum);
+    args.putString(STOP_NAME, stopName);
+    setArguments(args);
+    getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
+
   }
 }

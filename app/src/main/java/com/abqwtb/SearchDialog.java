@@ -1,5 +1,9 @@
 package com.abqwtb;
 
+import static com.abqwtb.StopsListActivity.ROUTE_NUM;
+import static com.abqwtb.StopsListActivity.STOP_ID;
+import static com.abqwtb.StopsListActivity.STOP_NAME;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -9,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.EditText;
 
 public class SearchDialog extends DialogFragment {
 
@@ -16,9 +21,24 @@ public class SearchDialog extends DialogFragment {
   private LayoutInflater inflater;
   private AlertDialog alertDialog;
 
+  public static SearchDialog newInstance(int stopId, int routeNum, String stopName) {
+
+    Bundle args = new Bundle();
+
+    args.putInt(STOP_ID, stopId);
+    args.putInt(ROUTE_NUM, routeNum);
+    args.putString(STOP_NAME, stopName);
+
+    SearchDialog fragment = new SearchDialog();
+    fragment.setArguments(args);
+    return fragment;
+  }
+
   @NonNull
   @Override
   public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+    Bundle args = getArguments();
 
     // Get the layout inflater
 
@@ -27,6 +47,18 @@ public class SearchDialog extends DialogFragment {
     if (view == null) {
       inflater = getActivity().getLayoutInflater();
       view = inflater.inflate(R.layout.search_dialog, null);
+      if (args != null) {
+        if (args.getInt(STOP_ID) > 0) {
+          ((EditText) view.findViewById(R.id.stop_id_search))
+              .setText(String.valueOf(args.getInt(STOP_ID)));
+        }
+        if (args.getInt(ROUTE_NUM) > 0) {
+          ((EditText) view.findViewById(R.id.route_number_search))
+              .setText(String.valueOf(args.getInt(ROUTE_NUM)));
+        }
+        ((EditText) view.findViewById(R.id.stop_name_search))
+            .setText(args.getString(STOP_NAME));
+      }
     }
     if (alertDialog == null) {
       final Activity activity = getActivity();
