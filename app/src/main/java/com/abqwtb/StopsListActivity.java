@@ -28,6 +28,11 @@ import java.io.IOException;
 public class StopsListActivity extends AppCompatActivity implements SearchDialogListener,
     OnNavigationItemSelectedListener {
 
+  public static final String STOP_NAME = "STOP_NAME";
+  public static final String ROUTE_NUM = "ROUTE_NUM";
+  public static final String STOP_ID = "STOP_ID";
+  public static final String SEARCH_FRAGMENT_TAG = "SEARCH_FRAGMENT";
+
   private ActionBar actionbar;
   private DbHelper dbHelper;
   private DrawerLayout mDrawerLayout;
@@ -35,6 +40,12 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   private MenuItem search_menu_item;
   private SearchStopsFragment searchStopsFragment;
   private SearchDialog searchDialog;
+  private EditText stopIdSearch;
+  private EditText routeNumSearch;
+  private EditText stopNameSearch;
+  private int stopId = -1;
+  private int routeNum = -1;
+  private String stopName;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +85,13 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
 
     new LoadIcons().execute();
 
-    searchDialog = new SearchDialog();
+    if (savedInstanceState != null) {
+      stopId = savedInstanceState.getInt(STOP_ID);
+      routeNum = savedInstanceState.getInt(ROUTE_NUM);
+      stopName = savedInstanceState.getString(STOP_NAME);
+    }
+
+    searchDialog = SearchDialog.newInstance(stopId, routeNum, stopName);
 
   }
 
@@ -146,34 +163,38 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
 
   @Override
   public void onSearch(DialogFragment dialog) {
+    if (searchStopsFragment == null) {
+      searchStopsFragment = (SearchStopsFragment) getSupportFragmentManager()
+          .findFragmentByTag(SEARCH_FRAGMENT_TAG);
+    }
     if (searchStopsFragment != null && searchStopsFragment.isVisible()) {
-      String stopId = ((EditText) dialog.getDialog().findViewById(R.id.stop_id_search)).getText()
+      stopIdSearch = dialog.getDialog().findViewById(R.id.stop_id_search);
+      String stopIdText = stopIdSearch.getText()
           .toString().trim();
-      String routeNum = ((EditText) dialog.getDialog().findViewById(R.id.route_number_search))
+      routeNumSearch = dialog.getDialog().findViewById(R.id.route_number_search);
+      String routeNumText = routeNumSearch
           .getText().toString().trim();
-      String stopName = ((EditText) dialog.getDialog().findViewById(R.id.stop_name_search))
+      stopNameSearch = dialog.getDialog().findViewById(R.id.stop_name_search);
+      stopName = stopNameSearch
           .getText().toString().trim();
-      int stopIdInt;
-      int routeNumInt;
       try {
-        if (stopId.isEmpty()) {
-          stopIdInt = -1;
+        if (stopIdText.isEmpty()) {
+          stopId = -1;
         } else {
-          stopIdInt = Integer.parseInt(stopId);
+          stopId = Integer.parseInt(stopIdText);
         }
-        if (routeNum.isEmpty()) {
-          routeNumInt = -1;
+        if (routeNumText.isEmpty()) {
+          routeNum = -1;
         } else {
-          routeNumInt = Integer.parseInt(routeNum);
+          routeNum = Integer.parseInt(routeNumText);
         }
       } catch (NumberFormatException e) {
         e.printStackTrace();
         Toast.makeText(this, "Invalid Entry", Toast.LENGTH_SHORT).show();
         return;
       }
-      if (searchStopsFragment != null && searchStopsFragment.isVisible()) {
-        searchStopsFragment.onSearch(stopIdInt, routeNumInt, stopName);
-      }
+
+      searchStopsFragment.onSearch(stopId, routeNum, stopName);
     }
   }
 
@@ -189,9 +210,11 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
             .replace(R.id.main_container, new FavoriteStopsFragment()).commit();
         break;
       case R.id.nav_search:
-        searchStopsFragment = new SearchStopsFragment();
+        if (searchStopsFragment == null) {
+          searchStopsFragment = SearchStopsFragment.newInstance(stopId, routeNum, stopName);
+        }
         getSupportFragmentManager().beginTransaction()
-            .replace(R.id.main_container, searchStopsFragment).commit();
+            .replace(R.id.main_container, searchStopsFragment, SEARCH_FRAGMENT_TAG).commit();
         break;
       case R.id.nav_feedback:
         Uri uri = Uri.parse("market://details?id=" + getPackageName());
@@ -239,4 +262,25 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
       return null;
     }
   }
+
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+
+    outState.putInt(STOP_ID, stopId);
+    outState.putInt(ROUTE_NUM, routeNum);
+    outState.putString(STOP_NAME, stopName);
+  }
+
+  @Override
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    super.onRestoreInstanceState(savedInstanceState);
+
+    if (savedInstanceState != null) {
+      stopId = savedInstanceState.getInt(STOP_ID);
+      routeNum = savedInstanceState.getInt(ROUTE_NUM);
+      stopName = savedInstanceState.getString(STOP_NAME);
+    }
+  }
+
 }
