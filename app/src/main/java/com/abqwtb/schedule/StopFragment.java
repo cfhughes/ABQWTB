@@ -109,8 +109,8 @@ public class StopFragment extends Fragment {
                 trips[i].route = Integer.parseInt(item[1]);
                 trips[i].secondsLate = Float.parseFloat(item[2]);
                 trips[i].busId = Integer.parseInt(item[3].trim());
-              } catch (NumberFormatException e) {
-                //e.printStackTrace();
+              } catch (IllegalArgumentException e) {
+                e.printStackTrace();
               }
             }
             adapter = new ScheduleAdapter(context, trips);
