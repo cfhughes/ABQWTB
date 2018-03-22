@@ -2,6 +2,7 @@ package com.abqwtb.bus;
 
 import android.Manifest.permission;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.PackageManager;
@@ -10,7 +11,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +18,7 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import com.abqwtb.ABQBusApplication;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
@@ -33,8 +34,8 @@ import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -133,7 +134,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
       });
     }
     mHandler = new Handler();
-    queue = Volley.newRequestQueue(getContext());
+    queue = Volley.newRequestQueue(getActivity());
 
     ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
     mTracker = application.getDefaultTracker();
@@ -145,7 +146,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
       Bundle savedInstanceState) {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_bus, container, false);
-    SupportMapFragment mapFragment = SupportMapFragment.newInstance();
+    MapFragment mapFragment = MapFragment.newInstance();
     getFragmentManager().beginTransaction().add(R.id.map_container, mapFragment).commit();
     mapFragment.getMapAsync(this);
     nextStop = (TextView) view.findViewById(R.id.bus_next_stop);
