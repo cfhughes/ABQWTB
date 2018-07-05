@@ -1,16 +1,16 @@
 package com.abqwtb.stops;
 
+import android.app.Fragment;
+import android.app.LoaderManager;
 import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+
 import com.abqwtb.ABQBusApplication;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
@@ -25,6 +26,7 @@ import com.abqwtb.StopsProvider;
 import com.abqwtb.schedule.StopFragment;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+
 import java.util.Collections;
 import java.util.Set;
 
@@ -80,9 +82,9 @@ public class FavoriteStopsFragment extends Fragment implements
     savedStops = sharedPref
         .getStringSet(getString(R.string.favorite_stops_key), null);
     if (savedStops != null && savedStops.size() > 0) {
-      getActivity().getSupportLoaderManager().restartLoader(1, null, FavoriteStopsFragment.this);
+      getActivity().getLoaderManager().restartLoader(1, null, FavoriteStopsFragment.this);
     } else {
-      getActivity().getSupportLoaderManager().destroyLoader(1);
+      getActivity().getLoaderManager().destroyLoader(1);
     }
     mTracker.setScreenName("ABQBus Favorite Stops");
     mTracker.send(new HitBuilders.ScreenViewBuilder().build());

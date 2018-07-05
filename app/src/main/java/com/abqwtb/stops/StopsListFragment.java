@@ -3,6 +3,10 @@ package com.abqwtb.stops;
 
 import android.Manifest;
 import android.Manifest.permission;
+import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -11,11 +15,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+
 import com.abqwtb.ABQBusApplication;
 import com.abqwtb.DbHelper;
 import com.abqwtb.R;
@@ -38,19 +39,14 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link StopsListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class StopsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
   private static final int PERMISSION_REQUEST_LOCATION = 1;
+  private static Location lastLocation = new Location("nothing");
   private FusedLocationProviderClient mFusedLocationClient;
   private LocationCallback mLocationCallback;
   private LocationRequest mLocationRequest;
   private StopsAdapter cursorAdapter;
-  private static Location lastLocation = new Location("nothing");
   private DbHelper dbHelper;
   private Tracker mTracker;
   private ListView listContent;
@@ -70,14 +66,14 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
       @Override
       public void onLocationResult(LocationResult locationResult) {
         lastLocation = locationResult.getLastLocation();
-        getActivity().getSupportLoaderManager().restartLoader(0, null, StopsListFragment.this);
+        getActivity().getLoaderManager().restartLoader(0, null, StopsListFragment.this);
       }
     };
 
     cursorAdapter =
         new StopsAdapter(getActivity(), null, false);
 
-    getActivity().getSupportLoaderManager().initLoader(0, null, this);
+    getActivity().getLoaderManager().initLoader(0, null, this);
 
     ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
     mTracker = application.getDefaultTracker();
@@ -160,9 +156,9 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
 
   private void startLocationUpdates() {
     createLocationRequest();
-    if (ActivityCompat.checkSelfPermission(getContext(), permission.ACCESS_FINE_LOCATION)
+    if (ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED
-        && ActivityCompat.checkSelfPermission(getContext(), permission.ACCESS_COARSE_LOCATION)
+            && ActivityCompat.checkSelfPermission(getActivity(), permission.ACCESS_COARSE_LOCATION)
         != PackageManager.PERMISSION_GRANTED) {
       Log.v("Location", "Permission not granted");
       // TODO: Consider calling

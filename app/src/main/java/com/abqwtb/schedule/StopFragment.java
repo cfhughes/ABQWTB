@@ -1,6 +1,7 @@
 package com.abqwtb.schedule;
 
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -8,7 +9,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +19,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import com.abqwtb.ABQBusApplication;
 import com.abqwtb.DbHelper;
 import com.abqwtb.R;
@@ -34,11 +35,13 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class StopFragment extends Fragment {
 
@@ -89,7 +92,7 @@ public class StopFragment extends Fragment {
     mTracker.enableAdvertisingIdCollection(true);
 
     mHandler = new Handler();
-    queue = Volley.newRequestQueue(getContext());
+    queue = Volley.newRequestQueue(getActivity());
 
     stringRequest = new StringRequest(Request.Method.GET, url,
         new Response.Listener<String>() {
@@ -119,7 +122,7 @@ public class StopFragment extends Fragment {
                 e.printStackTrace();
               }
             }
-            adapter = new ScheduleAdapter(context, trips);
+            adapter = new ScheduleAdapter(getActivity(), trips);
             schedule.setAdapter(adapter);
             schedule.setOnItemClickListener(new OnItemClickListener() {
               @Override
@@ -138,7 +141,7 @@ public class StopFragment extends Fragment {
         if (!isAdded()) {
           return;
         }
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(
             "An error occurred while retrieving data, please check your internet connection.");
         builder.setTitle("Connection Error");
@@ -171,7 +174,7 @@ public class StopFragment extends Fragment {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_stop, container, false);
     TextView mainText = view.findViewById(R.id.stop_main_text);
-    DbHelper helper = ((StopsListActivity) context).getDbHelper();
+    DbHelper helper = ((StopsListActivity) getActivity()).getDbHelper();
     Cursor cursor = helper
         .query("stops_local", new String[]{"stop_name", "direction"}, "stop_code = ?",
             new String[]{String.valueOf(stop_id)}, null, null, null);

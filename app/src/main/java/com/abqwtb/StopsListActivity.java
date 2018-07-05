@@ -19,10 +19,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import com.abqwtb.SearchDialog.SearchDialogListener;
 import com.abqwtb.stops.FavoriteStopsFragment;
 import com.abqwtb.stops.SearchStopsFragment;
 import com.abqwtb.stops.StopsListFragment;
+
 import java.io.IOException;
 
 public class StopsListActivity extends AppCompatActivity implements SearchDialogListener,
@@ -79,7 +81,7 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
 
     getDbHelper();
     if (savedInstanceState == null) {
-      getSupportFragmentManager().beginTransaction()
+      getFragmentManager().beginTransaction()
           .replace(R.id.main_container, new StopsListFragment()).commit();
     }
 
@@ -151,7 +153,7 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
         if (topLevel) {
           mDrawerLayout.openDrawer(GravityCompat.START);
         } else {
-          getSupportFragmentManager().popBackStack();
+          getFragmentManager().popBackStack();
         }
         return true;
       case R.id.search:
@@ -164,7 +166,7 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   @Override
   public void onSearch(DialogFragment dialog) {
     if (searchStopsFragment == null) {
-      searchStopsFragment = (SearchStopsFragment) getSupportFragmentManager()
+      searchStopsFragment = (SearchStopsFragment) getFragmentManager()
           .findFragmentByTag(SEARCH_FRAGMENT_TAG);
     }
     if (searchStopsFragment != null && searchStopsFragment.isVisible()) {
@@ -202,18 +204,18 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   public boolean onNavigationItemSelected(@NonNull MenuItem item) {
     switch (item.getItemId()) {
       case R.id.nav_nearest:
-        getSupportFragmentManager().beginTransaction()
+        getFragmentManager().beginTransaction()
             .replace(R.id.main_container, new StopsListFragment()).commit();
         break;
       case R.id.nav_favorites:
-        getSupportFragmentManager().beginTransaction()
+        getFragmentManager().beginTransaction()
             .replace(R.id.main_container, new FavoriteStopsFragment()).commit();
         break;
       case R.id.nav_search:
         if (searchStopsFragment == null) {
           searchStopsFragment = SearchStopsFragment.newInstance(stopId, routeNum, stopName);
         }
-        getSupportFragmentManager().beginTransaction()
+        getFragmentManager().beginTransaction()
             .replace(R.id.main_container, searchStopsFragment, SEARCH_FRAGMENT_TAG).commit();
         break;
       case R.id.nav_feedback:
@@ -234,6 +236,26 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     }
     mDrawerLayout.closeDrawers();
     return true;
+  }
+
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+
+    outState.putInt(STOP_ID, stopId);
+    outState.putInt(ROUTE_NUM, routeNum);
+    outState.putString(STOP_NAME, stopName);
+  }
+
+  @Override
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    super.onRestoreInstanceState(savedInstanceState);
+
+    if (savedInstanceState != null) {
+      stopId = savedInstanceState.getInt(STOP_ID);
+      routeNum = savedInstanceState.getInt(ROUTE_NUM);
+      stopName = savedInstanceState.getString(STOP_NAME);
+    }
   }
 
   public class LoadIcons extends AsyncTask<Object, Object, Object> {
@@ -260,26 +282,6 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
       adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);*/
 
       return null;
-    }
-  }
-
-  @Override
-  public void onSaveInstanceState(@NonNull Bundle outState) {
-    super.onSaveInstanceState(outState);
-
-    outState.putInt(STOP_ID, stopId);
-    outState.putInt(ROUTE_NUM, routeNum);
-    outState.putString(STOP_NAME, stopName);
-  }
-
-  @Override
-  protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    super.onRestoreInstanceState(savedInstanceState);
-
-    if (savedInstanceState != null) {
-      stopId = savedInstanceState.getInt(STOP_ID);
-      routeNum = savedInstanceState.getInt(ROUTE_NUM);
-      stopName = savedInstanceState.getString(STOP_NAME);
     }
   }
 
