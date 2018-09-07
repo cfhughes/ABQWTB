@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.abqwtb.ABQBusApplication;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
+import com.amazon.geo.mapsv2.AmazonMap;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
@@ -30,22 +31,21 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
+import com.amazon.geo.mapsv2.CameraUpdate;
+import com.amazon.geo.mapsv2.CameraUpdateFactory;
+import com.amazon.geo.mapsv2.OnMapReadyCallback;
+import com.amazon.geo.mapsv2.SupportMapFragment;
+import com.amazon.geo.mapsv2.model.BitmapDescriptorFactory;
+import com.amazon.geo.mapsv2.model.LatLng;
+import com.amazon.geo.mapsv2.model.Marker;
+import com.amazon.geo.mapsv2.model.MarkerOptions;
 
 public class BusFragment extends Fragment implements OnMapReadyCallback {
 
   private static final String ARG_BUS_ID = "bus_id";
 
   private Marker marker;
-  private GoogleMap map;
+  private AmazonMap map;
   private Runnable mRunnable;
   private Handler mHandler;
   private RequestQueue queue;
@@ -154,7 +154,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
   }
 
   @Override
-  public void onMapReady(GoogleMap googleMap) {
+  public void onMapReady(AmazonMap googleMap) {
     if (!isAdded()) {
       return;
     }
