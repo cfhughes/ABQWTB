@@ -80,7 +80,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
           if (!isAdded()) {
             return; //Stop if Fragment isn't in an activity
           }
-          if (response.contains(":")) {
+          if (response.contains(":") && response.length() > 1) {
             String[] coords = response.split(":");
             nextStop.setText(String.format("Next Stop: %s", coords[0]));
             LatLng position = new LatLng(Double.parseDouble(coords[1]),
@@ -109,6 +109,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
             });
             AlertDialog alert = builder.create();
             alert.show();
+            getFragmentManager().popBackStack();
           }
         }
       }, new ErrorListener() {
