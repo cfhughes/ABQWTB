@@ -116,7 +116,7 @@ public class StopFragment extends Fragment {
                 trips[i].secondsLate = Float.parseFloat(item[2]);
                 trips[i].busId = Integer.parseInt(item[3].trim());
               } catch (IllegalArgumentException e) {
-                e.printStackTrace();
+                //Do Nothing, this happens when there is no bus id to parse
               }
             }
             adapter = new ScheduleAdapter(context, trips);
