@@ -248,8 +248,8 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
       while (routes.moveToNext()) {
         RouteIcon.routeIcons.put(Integer.parseInt(routes.getString(0).trim()),
             new RouteIcon(Integer.parseInt(routes.getString(0).trim()),
-                Color.parseColor("#" + routes.getString(1)),
-                Color.parseColor("#" + routes.getString(2))));
+                Color.parseColor("#" + routes.getString(1).trim()),
+                Color.parseColor("#" + routes.getString(2).trim())));
       }
       routes.close();
       //dbHelper.close();
