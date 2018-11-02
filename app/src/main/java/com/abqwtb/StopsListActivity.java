@@ -7,22 +7,22 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
-import androidx.fragment.app.DialogFragment;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.DialogFragment;
 import com.abqwtb.SearchDialog.SearchDialogListener;
 import com.abqwtb.stops.FavoriteStopsFragment;
 import com.abqwtb.stops.SearchStopsFragment;
 import com.abqwtb.stops.StopsListFragment;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import java.io.IOException;
 
 public class StopsListActivity extends AppCompatActivity implements SearchDialogListener,
@@ -236,6 +236,26 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     return true;
   }
 
+  @Override
+  public void onSaveInstanceState(@NonNull Bundle outState) {
+    super.onSaveInstanceState(outState);
+
+    outState.putInt(STOP_ID, stopId);
+    outState.putInt(ROUTE_NUM, routeNum);
+    outState.putString(STOP_NAME, stopName);
+  }
+
+  @Override
+  protected void onRestoreInstanceState(Bundle savedInstanceState) {
+    super.onRestoreInstanceState(savedInstanceState);
+
+    if (savedInstanceState != null) {
+      stopId = savedInstanceState.getInt(STOP_ID);
+      routeNum = savedInstanceState.getInt(ROUTE_NUM);
+      stopName = savedInstanceState.getString(STOP_NAME);
+    }
+  }
+
   public class LoadIcons extends AsyncTask<Object, Object, Object> {
 
     @Override
@@ -260,26 +280,6 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
       adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);*/
 
       return null;
-    }
-  }
-
-  @Override
-  public void onSaveInstanceState(@NonNull Bundle outState) {
-    super.onSaveInstanceState(outState);
-
-    outState.putInt(STOP_ID, stopId);
-    outState.putInt(ROUTE_NUM, routeNum);
-    outState.putString(STOP_NAME, stopName);
-  }
-
-  @Override
-  protected void onRestoreInstanceState(Bundle savedInstanceState) {
-    super.onRestoreInstanceState(savedInstanceState);
-
-    if (savedInstanceState != null) {
-      stopId = savedInstanceState.getInt(STOP_ID);
-      routeNum = savedInstanceState.getInt(ROUTE_NUM);
-      stopName = savedInstanceState.getString(STOP_NAME);
     }
   }
 

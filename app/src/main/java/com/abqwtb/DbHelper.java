@@ -15,20 +15,18 @@ import java.io.OutputStream;
 public class DbHelper extends SQLiteOpenHelper {
 
   public static final int VERSION = 12;
-  String DB_PATH = null;
   private static String DB_NAME = "stops_db";
-  private SQLiteDatabase myDataBase;
   private final Context myContext;
+  String DB_PATH = null;
+  private SQLiteDatabase myDataBase;
 
   public DbHelper(Context context) {
     super(context, DB_NAME, null, VERSION);
     this.myContext = context;
-    if(android.os.Build.VERSION.SDK_INT >= 17){
-      DB_PATH = context.getApplicationInfo().dataDir + "/databases/"+DB_NAME;
-    }
-    else
-    {
-      DB_PATH = "/data/data/" + context.getPackageName() + "/databases/"+DB_NAME;
+    if (android.os.Build.VERSION.SDK_INT >= 17) {
+      DB_PATH = context.getApplicationInfo().dataDir + "/databases/" + DB_NAME;
+    } else {
+      DB_PATH = "/data/data/" + context.getPackageName() + "/databases/" + DB_NAME;
     }
     Log.i("Path 1", DB_PATH);
   }
@@ -69,11 +67,11 @@ public class DbHelper extends SQLiteOpenHelper {
   }
 
   private void copyDataBase() throws IOException {
-    Log.i("dbcopy","Copying Database File");
+    Log.i("dbcopy", "Copying Database File");
     InputStream myInput = myContext.getAssets().open(DB_NAME);
     String outFileName = DB_PATH;
     File old = new File(DB_PATH);
-    if (!old.delete()){
+    if (!old.delete()) {
       Log.i("data", "Error Deleting Old Database");
     }
     OutputStream myOutput = new FileOutputStream(outFileName);
@@ -96,8 +94,9 @@ public class DbHelper extends SQLiteOpenHelper {
 
   @Override
   public synchronized void close() {
-    if (myDataBase != null)
+    if (myDataBase != null) {
       myDataBase.close();
+    }
     super.close();
   }
 
@@ -108,14 +107,15 @@ public class DbHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    Log.i("Upgrade","Upgrading Database " + oldVersion);
-    if (newVersion > oldVersion)
+    Log.i("Upgrade", "Upgrading Database " + oldVersion);
+    if (newVersion > oldVersion) {
       try {
         copyDataBase();
       } catch (IOException e) {
         e.printStackTrace();
 
       }
+    }
   }
 
   public Cursor query(String table, String[] columns, String selection, String[] selectionArgs,
@@ -124,6 +124,6 @@ public class DbHelper extends SQLiteOpenHelper {
   }
 
   public Cursor rawQuery(String query) {
-    return myDataBase.rawQuery(query,null);
+    return myDataBase.rawQuery(query, null);
   }
 }

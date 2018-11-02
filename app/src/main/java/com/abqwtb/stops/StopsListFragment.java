@@ -8,14 +8,6 @@ import android.database.Cursor;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import com.google.android.material.snackbar.Snackbar;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.core.content.ContextCompat;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +15,13 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 import com.abqwtb.ABQBusApplication;
 import com.abqwtb.DbHelper;
 import com.abqwtb.R;
@@ -37,20 +36,20 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.snackbar.Snackbar;
 
 /**
- * A simple {@link Fragment} subclass.
- * Use the {@link StopsListFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * A simple {@link Fragment} subclass. Use the {@link StopsListFragment#newInstance} factory method
+ * to create an instance of this fragment.
  */
 public class StopsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
   private static final int PERMISSION_REQUEST_LOCATION = 1;
+  private static Location lastLocation = new Location("nothing");
   private FusedLocationProviderClient mFusedLocationClient;
   private LocationCallback mLocationCallback;
   private LocationRequest mLocationRequest;
   private StopsAdapter cursorAdapter;
-  private static Location lastLocation = new Location("nothing");
   private DbHelper dbHelper;
   private Tracker mTracker;
   private ListView listContent;

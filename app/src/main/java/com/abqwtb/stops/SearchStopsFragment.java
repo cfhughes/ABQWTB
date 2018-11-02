@@ -7,12 +7,6 @@ import static com.abqwtb.StopsListActivity.STOP_NAME;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,6 +16,12 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
 import com.abqwtb.ABQBusApplication;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
@@ -40,6 +40,19 @@ public class SearchStopsFragment extends Fragment implements
   private int stopId = -1;
   private int routeNum = -1;
   private String stopName = "";
+
+  public static SearchStopsFragment newInstance(int stopId, int routeNum, String stopName) {
+
+    Bundle args = new Bundle();
+
+    args.putInt(STOP_ID, stopId);
+    args.putInt(ROUTE_NUM, routeNum);
+    args.putString(STOP_NAME, stopName);
+
+    SearchStopsFragment fragment = new SearchStopsFragment();
+    fragment.setArguments(args);
+    return fragment;
+  }
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,19 +92,6 @@ public class SearchStopsFragment extends Fragment implements
 
     return view;
 
-  }
-
-  public static SearchStopsFragment newInstance(int stopId, int routeNum, String stopName) {
-
-    Bundle args = new Bundle();
-
-    args.putInt(STOP_ID, stopId);
-    args.putInt(ROUTE_NUM, routeNum);
-    args.putString(STOP_NAME, stopName);
-
-    SearchStopsFragment fragment = new SearchStopsFragment();
-    fragment.setArguments(args);
-    return fragment;
   }
 
   @NonNull

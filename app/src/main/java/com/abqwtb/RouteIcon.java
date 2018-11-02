@@ -32,7 +32,6 @@ public class RouteIcon {
     GradientDrawable gd = (GradientDrawable) icon.getBackground().getCurrent();
     gd.setColor(stopColor);
 
-
     return icon;
   }
 

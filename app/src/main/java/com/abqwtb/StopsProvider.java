@@ -12,9 +12,10 @@ public class StopsProvider extends ContentProvider {
 
   public static final String PROVIDER_NAME = "com.abqwtb.sqlite";
 
-  public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/stops" );
+  public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/stops");
 
-  private static final UriMatcher uriMatcher ;
+  private static final UriMatcher uriMatcher;
+
   static {
     uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     uriMatcher.addURI(PROVIDER_NAME, "stops", 1);
@@ -31,12 +32,13 @@ public class StopsProvider extends ContentProvider {
   }
 
   @Override
-  public Cursor query(Uri uri, String[] columns, String selection, String[] args, String sortOrder) {
+  public Cursor query(Uri uri, String[] columns, String selection, String[] args,
+      String sortOrder) {
     db = mOpenHelper.getReadableDatabase();
     Cursor result = null;
-    try{
+    try {
       result = db.query("stops_local", columns, selection, args, null, null, sortOrder, "300");
-    }catch(SQLException e){
+    } catch (SQLException e) {
       e.printStackTrace();
     }
     return result;

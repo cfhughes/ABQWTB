@@ -40,10 +40,10 @@ public class StopsAdapter extends CursorAdapter {
     }
     LinearLayout ll = view.findViewById(R.id.routes_layout);
     ll.removeAllViews();
-    for (String route:routes){
+    for (String route : routes) {
       RouteIcon icon = RouteIcon.routeIcons.get(Integer.parseInt(route.trim()));
       if (icon != null) {
-        ll.addView(icon.getView(context,ll));
+        ll.addView(icon.getView(context, ll));
       }
     }
   }
