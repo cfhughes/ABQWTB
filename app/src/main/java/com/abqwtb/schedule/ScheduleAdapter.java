@@ -91,37 +91,37 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
     public void setData(BusTrip data) {
       trip = data;
-      if (trip.scheduledTime != null) {
+      if (trip.getScheduledTime() != null) {
 
         scheduleTime.setText(trip.toString());
 
-        expectedTime = trip.scheduledTime.withFieldAdded(DurationFieldType.seconds(),
-            Math.round(trip.secondsLate));
+        expectedTime = trip.getScheduledTime().withFieldAdded(DurationFieldType.seconds(),
+            Math.round(trip.getSecondsLate()));
 
         LocalTime nowc = LocalTime.now(DateTimeZone.forID("America/Denver"));
         long now = nowc.getMillisOfDay();
         updateTime(now);
 
-        RouteIcon icon = RouteIcon.routeIcons.get(trip.route);
+        RouteIcon icon = RouteIcon.routeIcons.get(trip.getRoute());
         ll.removeAllViews();
         if (icon != null) {
           ll.addView(icon.getView(getContext(), ll));
         }
 
-        if (trip.busId > 0) {
+        if (trip.getBusId() > 0) {
           arrow.setVisibility(View.VISIBLE);
         } else {
           arrow.setVisibility(View.INVISIBLE);
         }
 
         //Log.v("Late", ""+trip.secondsLate);
-        if (trip.secondsLate > 0) {
+        if (trip.getSecondsLate() > 0) {
           delay.setTextColor(Color.argb(200, 255, 0, 0));
-          delay.setText(String.format("+%.1f", trip.secondsLate / 60));
-        } else if (trip.secondsLate < -1) {
+          delay.setText(String.format("+%.1f", trip.getSecondsLate() / 60));
+        } else if (trip.getSecondsLate() < -1) {
           delay.setTextColor(Color.argb(200, 255, 150, 0));
-          delay.setText(String.format("-%.1f", Math.abs(trip.secondsLate / 60)));
-        } else if (trip.secondsLate == 0) {
+          delay.setText(String.format("-%.1f", Math.abs(trip.getSecondsLate() / 60)));
+        } else if (trip.getSecondsLate() == 0) {
           delay.setTextColor(Color.argb(200, 0, 255, 0));
           delay.setText(getContext().getString(R.string.on_time));
         } else {
@@ -140,7 +140,7 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     }
 
     public void updateTime(long now) {
-      if (trip.scheduledTime != null) {
+      if (trip.getScheduledTime() != null) {
         long diff = expectedTime.getMillisOfDay() - now;
         //Log.i("diff",""+scheduled.getTimeInMillis()+ " - " + now + " = " + diff);
         //Compensate for after midnight times

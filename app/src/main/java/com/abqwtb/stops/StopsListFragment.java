@@ -38,10 +38,6 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 
-/**
- * A simple {@link Fragment} subclass. Use the {@link StopsListFragment#newInstance} factory method
- * to create an instance of this fragment.
- */
 public class StopsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
   private static final int PERMISSION_REQUEST_LOCATION = 1;

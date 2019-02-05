@@ -111,10 +111,10 @@ public class StopFragment extends Fragment {
                 if (hour > 23) {
                   item[0] = (hour - 24) + item[0].substring(2);
                 }
-                trips[i].scheduledTime = fmt.parseLocalTime(item[0]);
-                trips[i].route = Integer.parseInt(item[1]);
-                trips[i].secondsLate = Float.parseFloat(item[2]);
-                trips[i].busId = Integer.parseInt(item[3].trim());
+                trips[i].setScheduledTime(fmt.parseLocalTime(item[0]));
+                trips[i].setRoute(Integer.parseInt(item[1]));
+                trips[i].setSecondsLate(Float.parseFloat(item[2]));
+                trips[i].setBusId(Integer.parseInt(item[3].trim()));
               } catch (IllegalArgumentException e) {
                 //Do Nothing, this happens when there is no bus id to parse
               }
@@ -124,8 +124,8 @@ public class StopFragment extends Fragment {
             schedule.setOnItemClickListener(new OnItemClickListener() {
               @Override
               public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (((ViewHolder) view.getTag()).trip.busId > 0) {
-                  BusFragment f = BusFragment.newInstance(((ViewHolder) view.getTag()).trip.busId);
+                if (((ViewHolder) view.getTag()).trip.getBusId() > 0) {
+                  BusFragment f = BusFragment.newInstance(((ViewHolder) view.getTag()).trip.getBusId());
                   getFragmentManager().beginTransaction().replace(R.id.main_container, f)
                       .addToBackStack("bus").commit();
                 }
