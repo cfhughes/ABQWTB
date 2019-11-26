@@ -1,9 +1,5 @@
 package com.abqwtb.stops;
 
-import static com.abqwtb.StopsListActivity.ROUTE_NUM;
-import static com.abqwtb.StopsListActivity.STOP_ID;
-import static com.abqwtb.StopsListActivity.STOP_NAME;
-
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,27 +12,31 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
-import com.abqwtb.ABQBusApplication;
+
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
 import com.abqwtb.schedule.StopFragment;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.abqwtb.StopsListActivity.ROUTE_NUM;
+import static com.abqwtb.StopsListActivity.STOP_ID;
+import static com.abqwtb.StopsListActivity.STOP_NAME;
 
 public class SearchStopsFragment extends Fragment implements
     LoaderManager.LoaderCallbacks<Cursor> {
 
   private StopsAdapter cursorAdapter;
-  private Tracker mTracker;
+  //private Tracker mTracker;
   private int stopId = -1;
   private int routeNum = -1;
   private String stopName = "";
@@ -65,9 +65,9 @@ public class SearchStopsFragment extends Fragment implements
 
     //getActivity().getSupportLoaderManager().initLoader(2, null, this);
 
-    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
-    mTracker = application.getDefaultTracker();
-    mTracker.enableAdvertisingIdCollection(true);
+//    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
+//    mTracker = application.getDefaultTracker();
+//    mTracker.enableAdvertisingIdCollection(true);
   }
 
   @Override
@@ -146,8 +146,8 @@ public class SearchStopsFragment extends Fragment implements
       stopName = getArguments().getString(STOP_NAME);
     }
     getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
-    mTracker.setScreenName("ABQBus Search Stops");
-    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+//    mTracker.setScreenName("ABQBus Search Stops");
+//    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
   @Override

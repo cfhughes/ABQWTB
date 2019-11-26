@@ -23,8 +23,8 @@ import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
 import com.abqwtb.schedule.StopFragment;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+//import com.google.android.gms.analytics.HitBuilders;
+//import com.google.android.gms.analytics.Tracker;
 import java.util.Collections;
 import java.util.Set;
 
@@ -32,7 +32,7 @@ public class FavoriteStopsFragment extends Fragment implements
     LoaderManager.LoaderCallbacks<Cursor> {
 
   private StopsAdapter cursorAdapter;
-  private Tracker mTracker;
+  //private Tracker mTracker;
   private Set<String> savedStops;
 
   @Override
@@ -45,8 +45,8 @@ public class FavoriteStopsFragment extends Fragment implements
     //getActivity().getSupportLoaderManager().initLoader(1, null, this);
 
     ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
-    mTracker = application.getDefaultTracker();
-    mTracker.enableAdvertisingIdCollection(true);
+//    mTracker = application.getDefaultTracker();
+//    mTracker.enableAdvertisingIdCollection(true);
   }
 
   @Override
@@ -84,8 +84,8 @@ public class FavoriteStopsFragment extends Fragment implements
     } else {
       getActivity().getSupportLoaderManager().destroyLoader(1);
     }
-    mTracker.setScreenName("ABQBus Favorite Stops");
-    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+//    mTracker.setScreenName("ABQBus Favorite Stops");
+//    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
   @NonNull

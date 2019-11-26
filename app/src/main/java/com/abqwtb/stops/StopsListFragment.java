@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -22,14 +23,12 @@ import androidx.fragment.app.Fragment;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
-import com.abqwtb.ABQBusApplication;
+
 import com.abqwtb.DbHelper;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
 import com.abqwtb.schedule.StopFragment;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -47,7 +46,7 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
   private LocationRequest mLocationRequest;
   private StopsAdapter cursorAdapter;
   private DbHelper dbHelper;
-  private Tracker mTracker;
+  //private Tracker mTracker;
   private ListView listContent;
 
 
@@ -74,9 +73,9 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
 
     getActivity().getSupportLoaderManager().initLoader(0, null, this);
 
-    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
-    mTracker = application.getDefaultTracker();
-    mTracker.enableAdvertisingIdCollection(true);
+//    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
+//    mTracker = application.getDefaultTracker();
+//    mTracker.enableAdvertisingIdCollection(true);
   }
 
   @Override
@@ -137,8 +136,8 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
         == PackageManager.PERMISSION_GRANTED) {
       startLocationUpdates();
     }
-    mTracker.setScreenName("ABQBus Stops");
-    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+//    mTracker.setScreenName("ABQBus Stops");
+//    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
   private void stopLocationUpdates() {

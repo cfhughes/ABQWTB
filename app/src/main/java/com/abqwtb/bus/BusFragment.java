@@ -16,9 +16,10 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import com.abqwtb.ABQBusApplication;
+
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.android.volley.Request.Method;
@@ -28,8 +29,6 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -54,7 +53,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
   private TextView nextStop;
   private ProgressBar progressBar;
   private ProgressBarAnimation progressBarAnimation;
-  private Tracker mTracker;
+  //private Tracker mTracker;
 
   public BusFragment() {
     // Required empty public constructor
@@ -136,9 +135,9 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
     mHandler = new Handler();
     queue = Volley.newRequestQueue(getContext());
 
-    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
-    mTracker = application.getDefaultTracker();
-    mTracker.enableAdvertisingIdCollection(true);
+//    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
+//    mTracker = application.getDefaultTracker();
+//    mTracker.enableAdvertisingIdCollection(true);
   }
 
   @Override
@@ -198,8 +197,8 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
       mHandler.postDelayed(mRunnable, 1000 * 15); // 15 seconds
       progressBar.startAnimation(progressBarAnimation);
     }
-    mTracker.setScreenName("ABQBus Tracker");
-    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    //mTracker.setScreenName("ABQBus Tracker");
+    //mTracker.send(new HitBuilders.ScreenViewBuilder().build());
   }
 
   public void onStart() {

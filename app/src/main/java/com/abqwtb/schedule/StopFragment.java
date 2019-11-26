@@ -17,9 +17,10 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import com.abqwtb.ABQBusApplication;
+
 import com.abqwtb.DbHelper;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
@@ -32,13 +33,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.analytics.HitBuilders;
-import com.google.android.gms.analytics.Tracker;
+
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.Set;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 public class StopFragment extends Fragment {
 
@@ -47,7 +48,7 @@ public class StopFragment extends Fragment {
   private static final String ARG_STOP_ID = "stop_id";
 
   private int stop_id;
-  private Tracker mTracker;
+  //private Tracker mTracker;
   private ScheduleAdapter adapter;
   private RequestQueue queue;
   private ListView schedule;
@@ -84,9 +85,9 @@ public class StopFragment extends Fragment {
 
     String url = "http://www.abqwtb.com/android.php?version=6&stop_id=" + stop_id;
 
-    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
+/*    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
     mTracker = application.getDefaultTracker();
-    mTracker.enableAdvertisingIdCollection(true);
+    mTracker.enableAdvertisingIdCollection(true);*/
 
     mHandler = new Handler();
     queue = Volley.newRequestQueue(getContext());
@@ -252,8 +253,8 @@ public class StopFragment extends Fragment {
   @Override
   public void onResume() {
     super.onResume();
-    mTracker.setScreenName("ABQBus Schedule");
-    mTracker.send(new HitBuilders.ScreenViewBuilder().setCustomDimension(1, "" + stop_id).build());
+    //mTracker.setScreenName("ABQBus Schedule");
+    //mTracker.send(new HitBuilders.ScreenViewBuilder().setCustomDimension(1, "" + stop_id).build());
     if (adapter != null) {
       adapter.startUpdateTimer();
       mHandler.post(mRunnable);

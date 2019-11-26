@@ -14,7 +14,7 @@ import java.io.OutputStream;
 
 public class DbHelper extends SQLiteOpenHelper {
 
-  public static final int VERSION = 12;
+  public static final int VERSION = 13; //13 is new as of 11/25/2019
   private static String DB_NAME = "stops_db";
   private final Context myContext;
   String DB_PATH = null;
