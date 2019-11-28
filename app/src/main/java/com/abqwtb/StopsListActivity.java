@@ -112,19 +112,9 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     }
   }*/
 
-  private void dbCreate() {
-    dbHelper = new DbHelper(this);
-    try {
-      dbHelper.createDataBase();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-    dbHelper.openDataBase();
-  }
-
   public synchronized DbHelper getDbHelper() {
     if (dbHelper == null) {
-      dbCreate();
+      dbHelper = DbHelper.getInstance(getApplicationContext());
     }
     return dbHelper;
   }

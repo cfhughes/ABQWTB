@@ -27,7 +27,7 @@ public class StopsProvider extends ContentProvider {
 
   @Override
   public boolean onCreate() {
-    mOpenHelper = new DbHelper(getContext());
+    mOpenHelper = DbHelper.getInstance(getContext().getApplicationContext());
     return true;
   }
 
