@@ -1,5 +1,6 @@
 package com.abqwtb.stops;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -24,6 +25,7 @@ import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
 import com.abqwtb.schedule.StopFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +70,7 @@ public class SearchStopsFragment extends Fragment implements
 //    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
 //    mTracker = application.getDefaultTracker();
 //    mTracker.enableAdvertisingIdCollection(true);
+
   }
 
   @Override
@@ -148,6 +151,10 @@ public class SearchStopsFragment extends Fragment implements
     getActivity().getSupportLoaderManager().restartLoader(2, null, SearchStopsFragment.this);
 //    mTracker.setScreenName("ABQBus Search Stops");
 //    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    Activity activity = getActivity();
+    if (activity != null) {
+      FirebaseAnalytics.getInstance(activity).setCurrentScreen(activity, "Search Stops", null);
+    }
   }
 
   @Override

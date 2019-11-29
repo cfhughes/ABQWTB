@@ -8,8 +8,12 @@ public class ABQBusApplication extends Application {
 /*  private static GoogleAnalytics sAnalytics;
   private static Tracker sTracker;*/
 
+  private static ABQBusApplication instance;
+  private WtbDbHelper dbHelper;
+
   @Override
   public void onCreate() {
+    instance = this;
     super.onCreate();
 
 //    sAnalytics = GoogleAnalytics.getInstance(this);
@@ -19,7 +23,7 @@ public class ABQBusApplication extends Application {
   }
 
   /**
-   * Gets the default {@link Tracker} for this {@link Application}.
+   * Gets the default Tracker for this {@link Application}.
    *
    * @return tracker
    */
@@ -32,4 +36,14 @@ public class ABQBusApplication extends Application {
     return sTracker;
   }*/
 
+  public static ABQBusApplication getInstance(){
+    return instance;
+  }
+
+  synchronized public WtbDbHelper getDbHelper(){
+    if (dbHelper == null){
+      dbHelper = new WtbDbHelper(this);
+    }
+    return dbHelper;
+  }
 }

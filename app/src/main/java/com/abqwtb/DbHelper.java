@@ -1,6 +1,6 @@
+/*
 package com.abqwtb;
 
-import android.app.Application;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
@@ -17,7 +17,7 @@ import java.io.OutputStream;
 public class DbHelper extends SQLiteOpenHelper {
 
   public static final int VERSION = 13; //13 is new as of 11/25/2019
-  private static String DB_NAME = "stops_db";
+  private static String DB_NAME = "stops_db.sqlite3";
   private final Context myContext;
   String DB_PATH = null;
   private SQLiteDatabase myDataBase;
@@ -104,6 +104,7 @@ public class DbHelper extends SQLiteOpenHelper {
     Log.v("done", "finished copying db");
   }
 
+*/
 /*  public synchronized void openDataBase() throws SQLException, IOException {
     createDataBase();
     String myPath = DB_PATH;
@@ -111,7 +112,8 @@ public class DbHelper extends SQLiteOpenHelper {
       Log.v("OpenDB", "Opening Database");
       myDataBase = SQLiteDatabase.openDatabase(myPath, null, SQLiteDatabase.OPEN_READONLY);
     }
-  }*/
+  }*//*
+
 
   @Override
   public synchronized void close() {
@@ -131,6 +133,7 @@ public class DbHelper extends SQLiteOpenHelper {
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
     Log.i("Upgrade", "Upgrading Database " + oldVersion);
     Log.w("Upgrading","Why is it upgrading this way?");
+*/
 /*    if (newVersion > oldVersion) {
       try {
         copyDataBase();
@@ -138,7 +141,8 @@ public class DbHelper extends SQLiteOpenHelper {
         e.printStackTrace();
 
       }
-    }*/
+    }*//*
+
   }
 
   public Cursor query(String table, String[] columns, String selection, String[] selectionArgs,
@@ -169,4 +173,4 @@ public class DbHelper extends SQLiteOpenHelper {
     //Database should be readonly
     return null;
   }
-}
+}*/

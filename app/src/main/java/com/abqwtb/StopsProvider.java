@@ -21,20 +21,17 @@ public class StopsProvider extends ContentProvider {
     uriMatcher.addURI(PROVIDER_NAME, "stops", 1);
   }
 
-  private DbHelper mOpenHelper;
-
   private SQLiteDatabase db;
 
   @Override
   public boolean onCreate() {
-    mOpenHelper = DbHelper.getInstance(getContext().getApplicationContext());
     return true;
   }
 
   @Override
   public Cursor query(Uri uri, String[] columns, String selection, String[] args,
       String sortOrder) {
-    db = mOpenHelper.getReadableDatabase();
+    db = ABQBusApplication.getInstance().getDbHelper().getReadableDatabase();
     Cursor result = null;
     try {
       result = db.query("stops_local", columns, selection, args, null, null, sortOrder, "300");

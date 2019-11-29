@@ -3,6 +3,7 @@ package com.abqwtb.stops;
 
 import android.Manifest;
 import android.Manifest.permission;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
@@ -24,7 +25,6 @@ import androidx.loader.app.LoaderManager;
 import androidx.loader.content.CursorLoader;
 import androidx.loader.content.Loader;
 
-import com.abqwtb.DbHelper;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
@@ -36,6 +36,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class StopsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -45,7 +46,6 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
   private LocationCallback mLocationCallback;
   private LocationRequest mLocationRequest;
   private StopsAdapter cursorAdapter;
-  private DbHelper dbHelper;
   //private Tracker mTracker;
   private ListView listContent;
 
@@ -138,6 +138,10 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
     }
 //    mTracker.setScreenName("ABQBus Stops");
 //    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    Activity activity = getActivity();
+    if (activity != null) {
+      FirebaseAnalytics.getInstance(activity).setCurrentScreen(activity, "Stops List", null);
+    }
   }
 
   private void stopLocationUpdates() {

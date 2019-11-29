@@ -3,6 +3,7 @@ package com.abqwtb;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -34,7 +35,6 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   public static final String SEARCH_FRAGMENT_TAG = "SEARCH_FRAGMENT";
 
   private ActionBar actionbar;
-  private DbHelper dbHelper;
   private DrawerLayout mDrawerLayout;
   private boolean topLevel;
   private MenuItem search_menu_item;
@@ -77,7 +77,6 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     actionbar.setDisplayHomeAsUpEnabled(true);
     setIsTopLevel(true);
 
-    getDbHelper();
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction()
           .replace(R.id.main_container, new StopsListFragment()).commit();
@@ -112,16 +111,9 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     }
   }*/
 
-  public synchronized DbHelper getDbHelper() {
-    if (dbHelper == null) {
-      dbHelper = DbHelper.getInstance(getApplicationContext());
-    }
-    return dbHelper;
-  }
-
   @Override
   protected void onDestroy() {
-    dbHelper.close();
+    ABQBusApplication.getInstance().getDbHelper().close();
     super.onDestroy();
   }
 
@@ -250,9 +242,9 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
 
     @Override
     protected Object doInBackground(Object... objects) {
-      getDbHelper();
+      SQLiteDatabase db = ABQBusApplication.getInstance().getDbHelper().getReadableDatabase();
 
-      Cursor routes = dbHelper
+      Cursor routes = db
           .query("routes", new String[]{"route_short_name", "route_color", "route_text_color"},
               null, null, null, null, null);
       while (routes.moveToNext()) {

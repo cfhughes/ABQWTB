@@ -1,5 +1,6 @@
 package com.abqwtb.stops;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -23,6 +24,7 @@ import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
 import com.abqwtb.schedule.StopFragment;
+import com.google.firebase.analytics.FirebaseAnalytics;
 //import com.google.android.gms.analytics.HitBuilders;
 //import com.google.android.gms.analytics.Tracker;
 import java.util.Collections;
@@ -86,6 +88,10 @@ public class FavoriteStopsFragment extends Fragment implements
     }
 //    mTracker.setScreenName("ABQBus Favorite Stops");
 //    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    Activity activity = getActivity();
+    if (activity != null) {
+      FirebaseAnalytics.getInstance(activity).setCurrentScreen(activity, "Favorite Stops", null);
+    }
   }
 
   @NonNull

@@ -1,11 +1,13 @@
 package com.abqwtb.schedule;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -21,7 +23,7 @@ import android.widget.TextView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
-import com.abqwtb.DbHelper;
+import com.abqwtb.ABQBusApplication;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.bus.BusFragment;
@@ -33,6 +35,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -172,8 +175,8 @@ public class StopFragment extends Fragment {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_stop, container, false);
     TextView mainText = view.findViewById(R.id.stop_main_text);
-    DbHelper helper = ((StopsListActivity) context).getDbHelper();
-    Cursor cursor = helper
+    SQLiteDatabase db = ABQBusApplication.getInstance().getDbHelper().getReadableDatabase();
+    Cursor cursor = db
         .query("stops_local", new String[]{"stop_name", "direction"}, "stop_code = ?",
             new String[]{String.valueOf(stop_id)}, null, null, null);
     cursor.moveToFirst();
@@ -255,6 +258,10 @@ public class StopFragment extends Fragment {
     super.onResume();
     //mTracker.setScreenName("ABQBus Schedule");
     //mTracker.send(new HitBuilders.ScreenViewBuilder().setCustomDimension(1, "" + stop_id).build());
+    Activity activity = getActivity();
+    if (activity != null) {
+      FirebaseAnalytics.getInstance(activity).setCurrentScreen(activity, "Schedule", null);
+    }
     if (adapter != null) {
       adapter.startUpdateTimer();
       mHandler.post(mRunnable);
