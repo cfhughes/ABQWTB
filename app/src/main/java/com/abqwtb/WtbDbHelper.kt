@@ -73,7 +73,7 @@ class WtbDbHelper(val context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
     companion object {
         const val ASSETS_PATH = "databases"
         const val DATABASE_NAME = "stops_db"
-        const val DATABASE_VERSION = 13
+        const val DATABASE_VERSION = 14
     }
 
 }
