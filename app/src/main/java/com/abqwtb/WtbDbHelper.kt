@@ -31,6 +31,7 @@ class WtbDbHelper(val context: Context) : SQLiteOpenHelper(context, DATABASE_NAM
 
         try {
             val outputFile = File(context.getDatabasePath(DATABASE_NAME).path)
+            outputFile.getParentFile().mkdirs();
             val outputStream = FileOutputStream(outputFile)
 
             inputStream.copyTo(outputStream)
