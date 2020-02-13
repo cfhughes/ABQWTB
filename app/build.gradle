@@ -8,8 +8,8 @@ android {
         applicationId "com.abqwtb"
         minSdkVersion 16
         targetSdkVersion 29
-        versionCode 110
-        versionName "2.1.7"
+        versionCode 111
+        versionName "2.1.8"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "google_maps_key",
                 (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
