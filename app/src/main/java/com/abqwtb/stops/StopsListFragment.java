@@ -28,7 +28,9 @@ import androidx.loader.content.Loader;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
+import com.abqwtb.model.BusStop;
 import com.abqwtb.schedule.StopFragment;
+import com.abqwtb.service.AtMyStopService;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -38,7 +40,15 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-public class StopsListFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class StopsListFragment extends Fragment {
 
   private static final int PERMISSION_REQUEST_LOCATION = 1;
   private static Location lastLocation = new Location("nothing");
@@ -48,6 +58,7 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
   private StopsAdapter cursorAdapter;
   //private Tracker mTracker;
   private ListView listContent;
+  private AtMyStopService atMyStopService;
 
 
   public StopsListFragment() {
@@ -64,18 +75,39 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
       @Override
       public void onLocationResult(LocationResult locationResult) {
         lastLocation = locationResult.getLastLocation();
-        getActivity().getSupportLoaderManager().restartLoader(0, null, StopsListFragment.this);
+        updateStopsList();
       }
     };
 
-    cursorAdapter =
-        new StopsAdapter(getActivity(), null, false);
+    Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://192.168.1.8:8080/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build();
 
-    getActivity().getSupportLoaderManager().initLoader(0, null, this);
+    atMyStopService = retrofit.create(AtMyStopService.class);
 
-//    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
-//    mTracker = application.getDefaultTracker();
-//    mTracker.enableAdvertisingIdCollection(true);
+    updateStopsList();
+  }
+
+  private void updateStopsList(){
+    atMyStopService.getStops(lastLocation.getLatitude(),lastLocation.getLongitude()).enqueue(new Callback<List<BusStop>>() {
+      @Override
+      public void onResponse(Call<List<BusStop>> call, Response<List<BusStop>> response) {
+        if (cursorAdapter != null) {
+          cursorAdapter.clear();
+          cursorAdapter.addAll(response.body());
+        }else{
+          cursorAdapter =
+                  new StopsAdapter(getActivity(), R.layout.stop_list_item, response.body());
+          listContent.setAdapter(cursorAdapter);
+        }
+      }
+
+      @Override
+      public void onFailure(Call<List<BusStop>> call, Throwable t) {
+        //Do Nothing
+      }
+    });
   }
 
   @Override
@@ -85,7 +117,6 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
     View view = inflater.inflate(R.layout.fragment_stops_list, container, false);
 
     listContent = (ListView) view.findViewById(R.id.content_list);
-    listContent.setAdapter(cursorAdapter);
 
     listContent.setOnItemClickListener(new OnItemClickListener() {
       @Override
@@ -152,7 +183,7 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
     mLocationRequest = new LocationRequest();
     mLocationRequest.setInterval(10000);
     mLocationRequest.setFastestInterval(5000);
-    //mLocationRequest.setSmallestDisplacement(20);
+    mLocationRequest.setSmallestDisplacement(10);
     mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
   }
 
@@ -175,32 +206,6 @@ public class StopsListFragment extends Fragment implements LoaderManager.LoaderC
     mFusedLocationClient.requestLocationUpdates(mLocationRequest,
         mLocationCallback,
         null /* Looper */);
-  }
-
-  @Override
-  public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-    Uri uri = StopsProvider.CONTENT_URI;
-    return new CursorLoader(getActivity(), uri, new String[]{"stop_code _id", "stop_name",
-        "(SELECT group_concat(route)  FROM route_stop_map WHERE stop_code = stops_local.stop_code)",
-        "direction"}, "`stop_lat` > ? AND `stop_lat` < ? AND `stop_lon` > ? AND `stop_lon` < ?",
-        new String[]{
-            String.valueOf(lastLocation.getLatitude() - 0.015),
-            String.valueOf(lastLocation.getLatitude() + 0.015),
-            String.valueOf(lastLocation.getLongitude() - 0.015),
-            String.valueOf(lastLocation.getLongitude() + 0.015)},
-        "((`stop_lat` - " + lastLocation.getLatitude() + ") * (`stop_lat` - " + lastLocation
-            .getLatitude() + ") + (`stop_lon` - " + lastLocation.getLongitude()
-            + ") * (`stop_lon` - " + lastLocation.getLongitude() + "))");
-  }
-
-  @Override
-  public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-    cursorAdapter.swapCursor(data);
-  }
-
-  @Override
-  public void onLoaderReset(Loader<Cursor> loader) {
-    cursorAdapter.swapCursor(null);
   }
 
   private void requestLocationPermission() {

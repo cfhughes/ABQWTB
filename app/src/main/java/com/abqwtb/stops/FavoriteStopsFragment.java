@@ -42,7 +42,7 @@ public class FavoriteStopsFragment extends Fragment implements
     super.onCreate(savedInstanceState);
 
     cursorAdapter =
-        new StopsAdapter(getActivity(), null, false);
+        new StopsAdapter(getActivity(), R.layout.stop_list_item, null);
 
     //getActivity().getSupportLoaderManager().initLoader(1, null, this);
 
@@ -108,12 +108,12 @@ public class FavoriteStopsFragment extends Fragment implements
 
   @Override
   public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-    cursorAdapter.swapCursor(data);
+    //cursorAdapter.swapCursor(data);
   }
 
   @Override
   public void onLoaderReset(Loader<Cursor> loader) {
-    cursorAdapter.swapCursor(null);
+    //cursorAdapter.swapCursor(null);
   }
 
   @Override

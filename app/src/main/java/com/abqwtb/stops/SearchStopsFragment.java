@@ -63,7 +63,7 @@ public class SearchStopsFragment extends Fragment implements
     setHasOptionsMenu(true);
 
     cursorAdapter =
-        new StopsAdapter(getActivity(), null, false);
+        new StopsAdapter(getActivity(), R.layout.stop_list_item, null);
 
     //getActivity().getSupportLoaderManager().initLoader(2, null, this);
 
@@ -125,12 +125,12 @@ public class SearchStopsFragment extends Fragment implements
 
   @Override
   public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
-    cursorAdapter.swapCursor(data);
+    //cursorAdapter.swapCursor(data);
   }
 
   @Override
   public void onLoaderReset(@NonNull Loader<Cursor> loader) {
-    cursorAdapter.swapCursor(null);
+    //cursorAdapter.swapCursor(null);
   }
 
   @Override
