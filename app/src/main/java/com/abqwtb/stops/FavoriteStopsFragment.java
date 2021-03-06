@@ -23,6 +23,7 @@ import com.abqwtb.ABQBusApplication;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
 import com.abqwtb.StopsProvider;
+import com.abqwtb.model.BusStop;
 import com.abqwtb.schedule.StopFragment;
 import com.google.firebase.analytics.FirebaseAnalytics;
 //import com.google.android.gms.analytics.HitBuilders;
@@ -41,8 +42,8 @@ public class FavoriteStopsFragment extends Fragment implements
   public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    cursorAdapter =
-        new StopsAdapter(getActivity(), R.layout.stop_list_item, null);
+//    cursorAdapter =
+//        new StopsAdapter();
 
     //getActivity().getSupportLoaderManager().initLoader(1, null, this);
 
@@ -58,14 +59,14 @@ public class FavoriteStopsFragment extends Fragment implements
     View view = inflater.inflate(R.layout.fragment_stops_list, container, false);
 
     ListView listContent = (ListView) view.findViewById(R.id.content_list);
-    listContent.setAdapter(cursorAdapter);
+    //listContent.setAdapter(cursorAdapter);
 
     listContent.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        StopFragment f = StopFragment.newInstance((Integer) view.getTag());
-        getFragmentManager().beginTransaction().replace(R.id.main_container, f)
-            .addToBackStack("stop_view").commit();
+       // StopFragment f = StopFragment.newInstance((BusStop) view.getTag());
+//        getFragmentManager().beginTransaction().replace(R.id.main_container, f)
+//            .addToBackStack("stop_view").commit();
         //listContent.setVisibility(View.GONE);
         //frameLayout.setVisibility(View.VISIBLE);
       }

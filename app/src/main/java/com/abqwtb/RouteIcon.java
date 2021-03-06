@@ -15,9 +15,9 @@ public class RouteIcon {
 
   private int stopColor;
   private int textColor;
-  private int route;
+  private String route;
 
-  public RouteIcon(int route, int stopColor, int textColor) {
+  public RouteIcon(String route, int stopColor, int textColor) {
     this.route = route;
     this.stopColor = stopColor;
     this.textColor = textColor;
@@ -43,7 +43,7 @@ public class RouteIcon {
     return textColor;
   }
 
-  public int getRoute() {
+  public String getRoute() {
     return route;
   }
 

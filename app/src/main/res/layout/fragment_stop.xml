@@ -30,10 +30,16 @@
 
   </LinearLayout>
 
-
   <ListView
     android:id="@+id/schedule"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"/>
+    android:layout_weight="1"
+    android:layout_height="0dp" />
+
+  <com.abqwtb.stops.StopClockView
+      android:id="@+id/stop_clock_view"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1" />
 
 </LinearLayout>

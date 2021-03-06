@@ -1,6 +1,9 @@
 package com.abqwtb.model;
 
-public class BusStop {
+import java.io.Serializable;
+import java.util.List;
+
+public class BusStop implements Serializable {
 
     private String id;
 
@@ -9,6 +12,8 @@ public class BusStop {
     private String title;
 
     private Point location;
+
+    private List<TripHeadSign> trips;
 
     public String getId() {
         return id;
@@ -42,6 +47,14 @@ public class BusStop {
         this.location = location;
     }
 
+    public List<TripHeadSign> getTrips() {
+        return trips;
+    }
+
+    public void setTrips(List<TripHeadSign> trips) {
+        this.trips = trips;
+    }
+
     public class Point{
         double x;
         double y;
@@ -63,4 +76,46 @@ public class BusStop {
         }
     }
 
+    public class TripHeadSign {
+
+        private String name;
+
+        private String route;
+
+        private String color;
+
+        private String textColor;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getRoute() {
+            return route;
+        }
+
+        public void setRoute(String route) {
+            this.route = route;
+        }
+
+        public String getColor() {
+            return color;
+        }
+
+        public void setColor(String color) {
+            this.color = color;
+        }
+
+        public String getTextColor() {
+            return textColor;
+        }
+
+        public void setTextColor(String textColor) {
+            this.textColor = textColor;
+        }
+    }
 }

@@ -7,45 +7,37 @@
   <LinearLayout
     android:paddingLeft="8dp"
     android:id="@+id/schedule_routes_layout"
-    android:layout_width="0dp"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:orientation="horizontal"
-    android:gravity="center_vertical"
-    android:layout_weight="0.2"/>
+    android:gravity="center_vertical" />
 
   <TextView
-    android:paddingLeft="16dp"
-    android:id="@+id/schedule_timer"
-    android:layout_width="0dp"
-    android:layout_height="wrap_content"
-    android:text="23:45"
-    android:textAppearance="?android:attr/textAppearanceListItem"
-    android:gravity="center_vertical"
-    android:layout_weight="0.3"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall"/>
-
+      android:id="@+id/schedule_timer"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center_vertical"
+      android:minHeight="?android:attr/listPreferredItemHeightSmall"
+      android:paddingStart="16dp"
+      android:paddingEnd="16dp"
+      android:text="23:45"
+      android:singleLine="true"
+      android:textAppearance="?android:attr/textAppearanceListItem"
+      android:textSize="24sp" />
 
 
   <TextView
-    android:paddingLeft="16dp"
-    android:id="@+id/schedule_time"
-    android:layout_width="0dp"
-    android:textAppearance="?android:attr/textAppearanceListItem"
-    android:layout_height="match_parent"
-    android:gravity="center_vertical"
-    android:text="12:22:53 PM"
-    android:layout_weight="0.5"/>
-
-  <TextView
-    android:paddingLeft="16dp"
-    android:paddingRight="8dp"
-    android:id="@+id/schedule_delay"
-    android:textSize="18sp"
-    android:layout_width="0dp"
-    android:layout_height="match_parent"
-    android:gravity="center_vertical"
-    android:text="On Time"
-    android:layout_weight="0.34"/>
+      android:id="@+id/trip_name"
+      android:layout_width="0dp"
+      android:layout_height="match_parent"
+      android:layout_weight="0.8"
+      android:gravity="center_vertical"
+      android:paddingLeft="14dp"
+      android:text="The Place I am Going"
+      android:singleLine="true"
+      android:ellipsize="end"
+      android:textAppearance="?android:attr/textAppearanceListItem"
+      android:textSize="24sp" />
 
   <ImageView
     android:id="@+id/bus_schedule_arrow"

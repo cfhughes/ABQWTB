@@ -82,7 +82,7 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
           .replace(R.id.main_container, new StopsListFragment()).commit();
     }
 
-    new LoadIcons().execute();
+    //new LoadIcons().execute();
 
     if (savedInstanceState != null) {
       stopId = savedInstanceState.getInt(STOP_ID);
@@ -238,31 +238,31 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     }
   }
 
-  public class LoadIcons extends AsyncTask<Object, Object, Object> {
-
-    @Override
-    protected Object doInBackground(Object... objects) {
-      SQLiteDatabase db = ABQBusApplication.getInstance().getDbHelper().getReadableDatabase();
-
-      Cursor routes = db
-          .query("routes", new String[]{"route_short_name", "route_color", "route_text_color"},
-              null, null, null, null, null);
-      while (routes.moveToNext()) {
-        RouteIcon.routeIcons.put(Integer.parseInt(routes.getString(0).trim()),
-            new RouteIcon(Integer.parseInt(routes.getString(0).trim()),
-                Color.parseColor("#" + routes.getString(1).trim()),
-                Color.parseColor("#" + routes.getString(2).trim())));
-      }
-      routes.close();
-      //dbHelper.close();
-
-      /*adapter = new RouteSpinnerAdapter(StopsListActivity.this,
-          android.R.layout.simple_spinner_item,
-          new ArrayList<RouteIcon>(RouteIcon.routeIcons.values()));
-      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);*/
-
-      return null;
-    }
-  }
+//  public class LoadIcons extends AsyncTask<Object, Object, Object> {
+//
+//    @Override
+//    protected Object doInBackground(Object... objects) {
+//      SQLiteDatabase db = ABQBusApplication.getInstance().getDbHelper().getReadableDatabase();
+//
+//      Cursor routes = db
+//          .query("routes", new String[]{"route_short_name", "route_color", "route_text_color"},
+//              null, null, null, null, null);
+//      while (routes.moveToNext()) {
+//        RouteIcon.routeIcons.put(Integer.parseInt(routes.getString(0).trim()),
+//            new RouteIcon(Integer.parseInt(routes.getString(0).trim()),
+//                Color.parseColor("#" + routes.getString(1).trim()),
+//                Color.parseColor("#" + routes.getString(2).trim())));
+//      }
+//      routes.close();
+//      //dbHelper.close();
+//
+//      /*adapter = new RouteSpinnerAdapter(StopsListActivity.this,
+//          android.R.layout.simple_spinner_item,
+//          new ArrayList<RouteIcon>(RouteIcon.routeIcons.values()));
+//      adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);*/
+//
+//      return null;
+//    }
+//  }
 
 }

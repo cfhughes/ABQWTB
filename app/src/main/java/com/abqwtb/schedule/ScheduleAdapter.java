@@ -12,17 +12,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.abqwtb.R;
 import com.abqwtb.RouteIcon;
+import com.abqwtb.model.BusStop;
 import com.abqwtb.model.BusTrip;
+import com.abqwtb.model.RealtimeTripInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalTime;
 
-public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
+public class ScheduleAdapter extends ArrayAdapter<RealtimeTripInfo> {
 
   private final List<ViewHolder> lstHolders;
   private LayoutInflater lf;
+  private final BusStop stop;
   private Handler mHandler = new Handler();
   private Runnable updateRemainingTimeRunnable = new Runnable() {
     @Override
@@ -39,9 +43,10 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     }
   };
 
-  public ScheduleAdapter(Context context, BusTrip[] objects) {
+  public ScheduleAdapter(Context context, List<RealtimeTripInfo> objects, BusStop stop) {
     super(context, 0, objects);
     lf = LayoutInflater.from(context);
+    this.stop = stop;
     lstHolders = new ArrayList<>();
     startUpdateTimer();
   }
@@ -57,9 +62,8 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
     if (convertView == null) {
       convertView = lf.inflate(R.layout.schedule_list_item, parent, false);
       viewHolder = new ViewHolder();
-      viewHolder.scheduleTime = convertView.findViewById(R.id.schedule_time);
       viewHolder.scheduleTimer = convertView.findViewById(R.id.schedule_timer);
-      viewHolder.delay = convertView.findViewById(R.id.schedule_delay);
+      viewHolder.tripName = convertView.findViewById(R.id.trip_name);
       viewHolder.ll = convertView.findViewById(R.id.schedule_routes_layout);
       viewHolder.arrow = convertView.findViewById(R.id.bus_schedule_arrow);
       convertView.setTag(viewHolder);
@@ -80,63 +84,75 @@ public class ScheduleAdapter extends ArrayAdapter<BusTrip> {
 
   public class ViewHolder {
 
-    BusTrip trip;
+    RealtimeTripInfo trip;
 
-    TextView scheduleTime;
+    TextView tripName;
     TextView scheduleTimer;
-    TextView delay;
     LinearLayout ll;
     LocalTime expectedTime;
     ImageView arrow;
 
-    public void setData(BusTrip data) {
+    public void setData(RealtimeTripInfo data) {
       trip = data;
       if (trip.getScheduledTime() != null) {
 
-        scheduleTime.setText(trip.toString());
-
-        expectedTime = trip.getScheduledTime().withFieldAdded(DurationFieldType.seconds(),
+        expectedTime = LocalTime.parse(trip.getScheduledTime()).withFieldAdded(DurationFieldType.seconds(),
             Math.round(trip.getSecondsLate()));
 
         LocalTime nowc = LocalTime.now(DateTimeZone.forID("America/Denver"));
         long now = nowc.getMillisOfDay();
         updateTime(now);
 
-        RouteIcon icon = RouteIcon.routeIcons.get(trip.getRoute());
-        ll.removeAllViews();
-        if (icon != null) {
-          ll.addView(icon.getView(getContext(), ll));
-        }
+        BusStop.TripHeadSign tripInfo = getInfoForRoute(trip.getRoute());
 
-        if (trip.getBusId() > 0) {
-          arrow.setVisibility(View.VISIBLE);
-        } else {
-          arrow.setVisibility(View.INVISIBLE);
+        ll.removeAllViews();
+
+        if (tripInfo != null) {
+          RouteIcon icon = new RouteIcon(tripInfo.getRoute(), Color.parseColor("#" + tripInfo.getColor()), Color.parseColor("#" + tripInfo.getTextColor()));
+          tripName.setText(tripInfo.getName());
+          if (icon != null) {
+            ll.addView(icon.getView(getContext(), ll));
+          }
         }
+//        if (trip.getBusId() > 0) {
+//          arrow.setVisibility(View.VISIBLE);
+//        } else {
+//          arrow.setVisibility(View.INVISIBLE);
+//        }
 
         //Log.v("Late", ""+trip.secondsLate);
-        if (trip.getSecondsLate() > 0) {
-          delay.setTextColor(Color.argb(200, 255, 0, 0));
-          delay.setText(String.format("+%.1f", trip.getSecondsLate() / 60));
-        } else if (trip.getSecondsLate() < -1) {
-          delay.setTextColor(Color.argb(200, 255, 150, 0));
-          delay.setText(String.format("-%.1f", Math.abs(trip.getSecondsLate() / 60)));
-        } else if (trip.getSecondsLate() == 0) {
-          delay.setTextColor(Color.argb(200, 0, 255, 0));
-          delay.setText(getContext().getString(R.string.on_time));
-        } else {
-          delay.setText("");
-        }
+//        if (trip.getSecondsLate() > 0) {
+//          delay.setTextColor(Color.argb(200, 255, 0, 0));
+//          delay.setText(String.format("+%.1f", (float) trip.getSecondsLate() / 60));
+//        } else if (trip.getSecondsLate() < -1) {
+//          delay.setTextColor(Color.argb(200, 255, 150, 0));
+//          delay.setText(String.format("-%.1f", Math.abs((float) trip.getSecondsLate() / 60)));
+//        } else if (trip.getSecondsLate() == 0) {
+//          delay.setTextColor(Color.argb(200, 0, 255, 0));
+//          delay.setText(getContext().getString(R.string.on_time));
+//        } else {
+//          delay.setText("");
+//        }
       } else {
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) scheduleTimer
             .getLayoutParams();
         params.weight = 10.0f;
         scheduleTimer.setText(getContext().getString(R.string.no_more_busses));
         arrow.setVisibility(View.INVISIBLE);
-        scheduleTime.setText("");
-        delay.setText("");
+        tripName.setText("");
       }
 
+    }
+
+    private BusStop.TripHeadSign getInfoForRoute(String route) {
+      for (int i = 0; i < stop.getTrips().size(); i++) {
+        BusStop.TripHeadSign current = stop.getTrips().get(i);
+        if (current.getRoute().equals(route)) {
+          return current;
+        }
+      }
+
+      return null;
     }
 
     public void updateTime(long now) {

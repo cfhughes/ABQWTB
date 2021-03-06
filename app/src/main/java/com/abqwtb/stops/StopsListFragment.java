@@ -5,32 +5,27 @@ import android.Manifest;
 import android.Manifest.permission;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.loader.app.LoaderManager;
-import androidx.loader.content.CursorLoader;
-import androidx.loader.content.Loader;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
-import com.abqwtb.StopsProvider;
 import com.abqwtb.model.BusStop;
 import com.abqwtb.schedule.StopFragment;
-import com.abqwtb.service.AtMyStopService;
+import com.abqwtb.viewmodel.StopsViewModel;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -42,23 +37,17 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
-public class StopsListFragment extends Fragment {
+public class StopsListFragment extends Fragment implements StopsAdapter.OnStopClickListener {
 
   private static final int PERMISSION_REQUEST_LOCATION = 1;
-  private static Location lastLocation = new Location("nothing");
   private FusedLocationProviderClient mFusedLocationClient;
   private LocationCallback mLocationCallback;
   private LocationRequest mLocationRequest;
-  private StopsAdapter cursorAdapter;
   //private Tracker mTracker;
-  private ListView listContent;
-  private AtMyStopService atMyStopService;
+  private RecyclerView listContent;
+
+  private StopsAdapter stopsAdapter;
+  private StopsViewModel viewModel;
 
 
   public StopsListFragment() {
@@ -69,45 +58,28 @@ public class StopsListFragment extends Fragment {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    stopsAdapter = new StopsAdapter(this);
+
+    viewModel = new ViewModelProvider(getActivity()).get(StopsViewModel.class);
+    viewModel.getStops().observe(this, new Observer<List<BusStop>>() {
+      @Override
+      public void onChanged(List<BusStop> busStops) {
+        if (busStops != null){
+          stopsAdapter.setStops(busStops);
+        }
+      }
+    });
+
     mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
     mLocationCallback = new LocationCallback() {
       @Override
       public void onLocationResult(LocationResult locationResult) {
-        lastLocation = locationResult.getLastLocation();
-        updateStopsList();
+        Location location = locationResult.getLastLocation();
+        viewModel.setLocation(location.getLatitude(), location.getLongitude());
       }
     };
 
-    Retrofit retrofit = new Retrofit.Builder()
-            .baseUrl("http://192.168.1.8:8080/")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build();
-
-    atMyStopService = retrofit.create(AtMyStopService.class);
-
-    updateStopsList();
-  }
-
-  private void updateStopsList(){
-    atMyStopService.getStops(lastLocation.getLatitude(),lastLocation.getLongitude()).enqueue(new Callback<List<BusStop>>() {
-      @Override
-      public void onResponse(Call<List<BusStop>> call, Response<List<BusStop>> response) {
-        if (cursorAdapter != null) {
-          cursorAdapter.clear();
-          cursorAdapter.addAll(response.body());
-        }else{
-          cursorAdapter =
-                  new StopsAdapter(getActivity(), R.layout.stop_list_item, response.body());
-          listContent.setAdapter(cursorAdapter);
-        }
-      }
-
-      @Override
-      public void onFailure(Call<List<BusStop>> call, Throwable t) {
-        //Do Nothing
-      }
-    });
   }
 
   @Override
@@ -116,18 +88,9 @@ public class StopsListFragment extends Fragment {
     // Inflate the layout for this fragment
     View view = inflater.inflate(R.layout.fragment_stops_list, container, false);
 
-    listContent = (ListView) view.findViewById(R.id.content_list);
-
-    listContent.setOnItemClickListener(new OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        StopFragment f = StopFragment.newInstance((Integer) view.getTag());
-        getFragmentManager().beginTransaction().replace(R.id.main_container, f)
-            .addToBackStack("stop_view").commit();
-        //listContent.setVisibility(View.GONE);
-        //frameLayout.setVisibility(View.VISIBLE);
-      }
-    });
+    listContent = (RecyclerView) view.findViewById(R.id.content_list);
+    listContent.setLayoutManager(new LinearLayoutManager(getContext()));
+    listContent.setAdapter(stopsAdapter);
 
     if (ContextCompat.checkSelfPermission(getActivity(),
         Manifest.permission.ACCESS_FINE_LOCATION)
@@ -138,7 +101,7 @@ public class StopsListFragment extends Fragment {
             public void onSuccess(Location location) {
               // Got last known location. In some rare situations this can be null.
               if (location != null) {
-                lastLocation = location;
+                viewModel.setLocation(location.getLatitude(), location.getLongitude());
               }
             }
           });
@@ -171,7 +134,10 @@ public class StopsListFragment extends Fragment {
 //    mTracker.send(new HitBuilders.ScreenViewBuilder().build());
     Activity activity = getActivity();
     if (activity != null) {
-      FirebaseAnalytics.getInstance(activity).setCurrentScreen(activity, "Stops List", null);
+      Bundle bundle = new Bundle();
+      bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, "Nearest Stops List");
+      bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, "StopsListActivity");
+      FirebaseAnalytics.getInstance(activity).logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
     }
   }
 
@@ -180,7 +146,7 @@ public class StopsListFragment extends Fragment {
   }
 
   private void createLocationRequest() {
-    mLocationRequest = new LocationRequest();
+    mLocationRequest = LocationRequest.create();
     mLocationRequest.setInterval(10000);
     mLocationRequest.setFastestInterval(5000);
     mLocationRequest.setSmallestDisplacement(10);
@@ -258,7 +224,7 @@ public class StopsListFragment extends Fragment {
                   public void onSuccess(Location location) {
                     // Got last known location. In some rare situations this can be null.
                     if (location != null) {
-                      lastLocation = location;
+                      viewModel.setLocation(location.getLatitude(), location.getLongitude());
                     }
                   }
                 });
@@ -274,5 +240,14 @@ public class StopsListFragment extends Fragment {
     super.onStart();
     ((StopsListActivity) getActivity()).setIsTopLevel(true);
     //((StopsListActivity) getActivity()).setSearchVisible(false);
+  }
+
+  @Override
+  public void onStopClick(BusStop stop) {
+    viewModel.setSelectedStop(stop);
+    viewModel.clearRealTimeData();
+    StopFragment f = StopFragment.newInstance();
+    getParentFragmentManager().beginTransaction().replace(R.id.main_container, f)
+            .addToBackStack("stop_view").commit();
   }
 }
