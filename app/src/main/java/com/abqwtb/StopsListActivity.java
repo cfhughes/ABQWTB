@@ -18,10 +18,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.lifecycle.ViewModelProvider;
+
 import com.abqwtb.SearchDialog.SearchDialogListener;
+import com.abqwtb.notifications.NotificationService;
 import com.abqwtb.stops.FavoriteStopsFragment;
 import com.abqwtb.stops.SearchStopsFragment;
 import com.abqwtb.stops.StopsListFragment;
+import com.abqwtb.viewmodel.StopsViewModel;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener;
 import java.io.IOException;
@@ -43,12 +49,15 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   private EditText stopIdSearch;
   private EditText routeNumSearch;
   private EditText stopNameSearch;
-  private int stopId = -1;
-  private int routeNum = -1;
+  private String stopId;
+  private String routeNum;
   private String stopName;
+  private StopsViewModel viewModel;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+
+    viewModel = new ViewModelProvider(this).get(StopsViewModel.class);
 
 /*    StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
         .detectDiskReads()
@@ -85,8 +94,8 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     //new LoadIcons().execute();
 
     if (savedInstanceState != null) {
-      stopId = savedInstanceState.getInt(STOP_ID);
-      routeNum = savedInstanceState.getInt(ROUTE_NUM);
+      stopId = savedInstanceState.getString(STOP_ID);
+      routeNum = savedInstanceState.getString(ROUTE_NUM);
       stopName = savedInstanceState.getString(STOP_NAME);
     }
 
@@ -144,6 +153,20 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   }
 
   @Override
+  protected void onPause() {
+    super.onPause();
+
+    FragmentManager.BackStackEntry current = getSupportFragmentManager().getBackStackEntryAt(0);
+
+    Fragment stopView = getSupportFragmentManager().findFragmentByTag("stop_view");
+    if (stopView != null && stopView.isVisible()) {
+      Intent intent = new Intent(this, NotificationService.class);
+      intent.putExtra("stop",viewModel.getSelectedStop().getValue());
+      startService(intent);
+    }
+  }
+
+  @Override
   public void onSearch(DialogFragment dialog) {
     if (searchStopsFragment == null) {
       searchStopsFragment = (SearchStopsFragment) getSupportFragmentManager()
@@ -151,30 +174,14 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     }
     if (searchStopsFragment != null && searchStopsFragment.isVisible()) {
       stopIdSearch = dialog.getDialog().findViewById(R.id.stop_id_search);
-      String stopIdText = stopIdSearch.getText()
+      String stopId = stopIdSearch.getText()
           .toString().trim();
       routeNumSearch = dialog.getDialog().findViewById(R.id.route_number_search);
-      String routeNumText = routeNumSearch
+      String routeNum = routeNumSearch
           .getText().toString().trim();
       stopNameSearch = dialog.getDialog().findViewById(R.id.stop_name_search);
       stopName = stopNameSearch
           .getText().toString().trim();
-      try {
-        if (stopIdText.isEmpty()) {
-          stopId = -1;
-        } else {
-          stopId = Integer.parseInt(stopIdText);
-        }
-        if (routeNumText.isEmpty()) {
-          routeNum = -1;
-        } else {
-          routeNum = Integer.parseInt(routeNumText);
-        }
-      } catch (NumberFormatException e) {
-        e.printStackTrace();
-        Toast.makeText(this, "Invalid Entry", Toast.LENGTH_SHORT).show();
-        return;
-      }
 
       searchStopsFragment.onSearch(stopId, routeNum, stopName);
     }
@@ -222,8 +229,8 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   public void onSaveInstanceState(@NonNull Bundle outState) {
     super.onSaveInstanceState(outState);
 
-    outState.putInt(STOP_ID, stopId);
-    outState.putInt(ROUTE_NUM, routeNum);
+    outState.putString(STOP_ID, stopId);
+    outState.putString(ROUTE_NUM, routeNum);
     outState.putString(STOP_NAME, stopName);
   }
 
@@ -232,8 +239,8 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
     super.onRestoreInstanceState(savedInstanceState);
 
     if (savedInstanceState != null) {
-      stopId = savedInstanceState.getInt(STOP_ID);
-      routeNum = savedInstanceState.getInt(ROUTE_NUM);
+      stopId = savedInstanceState.getString(STOP_ID);
+      routeNum = savedInstanceState.getString(ROUTE_NUM);
       stopName = savedInstanceState.getString(STOP_NAME);
     }
   }

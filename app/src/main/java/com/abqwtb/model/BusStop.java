@@ -1,5 +1,7 @@
 package com.abqwtb.model;
 
+import android.bluetooth.BluetoothClass;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -55,7 +57,7 @@ public class BusStop implements Serializable {
         this.trips = trips;
     }
 
-    public class Point{
+    public static class Point implements Serializable{
         double x;
         double y;
 
@@ -76,7 +78,7 @@ public class BusStop implements Serializable {
         }
     }
 
-    public class TripHeadSign {
+    public static class TripHeadSign implements Serializable {
 
         private String name;
 

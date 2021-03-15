@@ -1,11 +1,13 @@
 package com.abqwtb.viewmodel;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.abqwtb.model.BusStop;
 import com.abqwtb.model.RealtimeTripInfo;
 import com.abqwtb.service.AtMyStopService;
 
+import java.io.IOException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -19,9 +21,11 @@ public class StopRepository {
     private AtMyStopService atMyStopService;
     private final MutableLiveData<List<BusStop>> stopsLiveData;
     private final MutableLiveData<List<RealtimeTripInfo>> realTimeLiveData;
+    private final MutableLiveData<List<BusStop>> searchStopsLiveData;
 
     public StopRepository() {
         stopsLiveData = new MutableLiveData<>();
+        searchStopsLiveData = new MutableLiveData<>();
         realTimeLiveData = new MutableLiveData<>();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -54,12 +58,12 @@ public class StopRepository {
     }
 
     public void updateRealTimeData(String agency, String stopId) {
-        atMyStopService.getStopTimes(agency, stopId)
+        getStopTimes(agency, stopId)
                 .enqueue(new Callback<List<RealtimeTripInfo>>() {
                     @Override
                     public void onResponse(Call<List<RealtimeTripInfo>> call, Response<List<RealtimeTripInfo>> response) {
                         if (response.body() != null){
-                            realTimeLiveData.setValue(response.body());
+                            realTimeLiveData.postValue(response.body());
                         }
                     }
 
@@ -70,11 +74,40 @@ public class StopRepository {
                 });
     }
 
+    private Call<List<RealtimeTripInfo>> getStopTimes(String agency, String stopId) {
+        return atMyStopService.getStopTimes(agency, stopId);
+    }
+
+    public List<RealtimeTripInfo> getStopTimesSync(String agency, String stopId) throws IOException {
+        return getStopTimes(agency, stopId).execute().body();
+    }
+
     public MutableLiveData<List<RealtimeTripInfo>> getRealTimeLiveData() {
         return realTimeLiveData;
     }
 
     public void clearRealTimeData() {
         realTimeLiveData.setValue(null);
+    }
+
+    public void searchStops(String name, String route, String id) {
+        atMyStopService.getStopsSearch(name, route, id)
+                .enqueue(new Callback<List<BusStop>>() {
+                    @Override
+                    public void onResponse(Call<List<BusStop>> call, Response<List<BusStop>> response) {
+                        if (response.body() != null){
+                            searchStopsLiveData.setValue(response.body());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<BusStop>> call, Throwable t) {
+                        searchStopsLiveData.postValue(null);
+                    }
+                });
+    }
+
+    public LiveData<List<BusStop>> getSearchStopsLiveData() {
+        return searchStopsLiveData;
     }
 }

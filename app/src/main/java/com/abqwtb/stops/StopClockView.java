@@ -10,6 +10,7 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import com.abqwtb.model.BusStop;
 import com.abqwtb.model.RealtimeTripInfo;
 
 import org.joda.time.DateTimeZone;
@@ -21,6 +22,8 @@ import java.util.List;
 public class StopClockView extends View {
     private float diameter;
     private List<RealtimeTripInfo> trips = new ArrayList<>();
+    private List<BusStop.TripHeadSign> tripHeadsigns;
+    private float leftMargin;
 
     public StopClockView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -36,7 +39,9 @@ public class StopClockView extends View {
         float hh = (float)h - ypad;
 
         // Figure out how big we can make the pie.
-        diameter = Math.min(ww, hh);
+        diameter = Math.min(ww, hh)-60;
+
+        leftMargin = (ww - diameter)/2.0f;
     }
 
     @Override
@@ -45,7 +50,10 @@ public class StopClockView extends View {
 
         Paint paint = new Paint();
 
-        paint.setColor(0xffff1010);
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(9.0f);
 
         //canvas.drawArc(50,50,diameter-50,diameter-50,-90f,90f, true, paint);
 
@@ -56,9 +64,9 @@ public class StopClockView extends View {
             tripPaint.setColor(Color.BLACK);
 
             Paint actualPaint = new Paint(0);
-            actualPaint.setColor(Color.BLUE);
+            actualPaint.setAntiAlias(true);
 
-
+            actualPaint.setColor(Color.parseColor("#"+trip.getColor()));
 
             LocalTime time = LocalTime.parse(trip.getScheduledTime());
 
@@ -69,12 +77,19 @@ public class StopClockView extends View {
             float actualFromNow = (time.getMillisOfDay() - now.getMillisOfDay() + 0.0f + (trip.getSecondsLate() * 1000)) / (60 * 60 * 1000);
 
             //canvas.drawArc(0,0,diameter*0.8f,diameter*0.8f,268 - (scheduledFromNow*360),4, true, tripPaint);
-
-            canvas.drawArc(0,0,diameter,diameter,268 - (actualFromNow*360),4, true, actualPaint);
+            if (actualFromNow < 0) actualFromNow = 0;
+            canvas.drawArc(leftMargin,45,diameter+leftMargin,diameter+45,268 - (actualFromNow*360),4, true, actualPaint);
         }
 
+        canvas.drawCircle(leftMargin+diameter/2.0f,diameter/2.0f+45,diameter/2.0f,paint);
 
+        canvas.drawLine(leftMargin+(diameter/2.0f),0,leftMargin+(diameter/2.0f),diameter/2.0f,paint);
 
+        Paint redPaint = new Paint(0);
+        redPaint.setColor(Color.RED);
+        redPaint.setStyle(Paint.Style.STROKE);
+        redPaint.setStrokeWidth(40);
+        canvas.drawArc(leftMargin+15, 60, diameter+leftMargin-15,diameter+30,-120,360/12,false,redPaint);
     }
 
     public void setTrips(List<RealtimeTripInfo> trips) {

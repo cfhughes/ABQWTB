@@ -247,7 +247,7 @@ public class StopsListFragment extends Fragment implements StopsAdapter.OnStopCl
     viewModel.setSelectedStop(stop);
     viewModel.clearRealTimeData();
     StopFragment f = StopFragment.newInstance();
-    getParentFragmentManager().beginTransaction().replace(R.id.main_container, f)
+    getParentFragmentManager().beginTransaction().replace(R.id.main_container, f, "stop_view")
             .addToBackStack("stop_view").commit();
   }
 }

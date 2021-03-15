@@ -21,12 +21,12 @@ public class SearchDialog extends DialogFragment {
   private LayoutInflater inflater;
   private AlertDialog alertDialog;
 
-  public static SearchDialog newInstance(int stopId, int routeNum, String stopName) {
+  public static SearchDialog newInstance(String stopId, String routeNum, String stopName) {
 
     Bundle args = new Bundle();
 
-    args.putInt(STOP_ID, stopId);
-    args.putInt(ROUTE_NUM, routeNum);
+    args.putString(STOP_ID, stopId);
+    args.putString(ROUTE_NUM, routeNum);
     args.putString(STOP_NAME, stopName);
 
     SearchDialog fragment = new SearchDialog();
@@ -48,14 +48,13 @@ public class SearchDialog extends DialogFragment {
       inflater = getActivity().getLayoutInflater();
       view = inflater.inflate(R.layout.search_dialog, null);
       if (args != null) {
-        if (args.getInt(STOP_ID) > 0) {
-          ((EditText) view.findViewById(R.id.stop_id_search))
-              .setText(String.valueOf(args.getInt(STOP_ID)));
-        }
-        if (args.getInt(ROUTE_NUM) > 0) {
-          ((EditText) view.findViewById(R.id.route_number_search))
-              .setText(String.valueOf(args.getInt(ROUTE_NUM)));
-        }
+
+        ((EditText) view.findViewById(R.id.stop_id_search))
+            .setText(args.getString(STOP_ID));
+        
+        ((EditText) view.findViewById(R.id.route_number_search))
+            .setText(args.getString(ROUTE_NUM));
+
         ((EditText) view.findViewById(R.id.stop_name_search))
             .setText(args.getString(STOP_NAME));
       }

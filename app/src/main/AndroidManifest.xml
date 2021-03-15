@@ -46,6 +46,8 @@
       android:name="com.google.android.geo.API_KEY"
       android:value="AIzaSyBVDx06y5Jl1BUThyOHRwgEuu6rZuEcrHQ"/>
 
+    <service android:name=".notifications.NotificationService" />
+
   </application>
 
 </manifest>

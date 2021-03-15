@@ -13,6 +13,7 @@ public class StopsViewModel extends ViewModel {
 
     private StopRepository stopRepository;
     private LiveData<List<BusStop>> stopsLiveData;
+    private LiveData<List<BusStop>> searchStopsLiveData;
     private LiveData<List<RealtimeTripInfo>> realTimeLiveData;
     private MutableLiveData<BusStop> selectedStopLiveData = new MutableLiveData<>();
 
@@ -20,6 +21,7 @@ public class StopsViewModel extends ViewModel {
         stopRepository = new StopRepository();
         stopsLiveData = stopRepository.getStopsLiveData();
         realTimeLiveData = stopRepository.getRealTimeLiveData();
+        searchStopsLiveData = stopRepository.getSearchStopsLiveData();
     }
 
     public LiveData<List<BusStop>> getStops() {
@@ -34,6 +36,10 @@ public class StopsViewModel extends ViewModel {
         return selectedStopLiveData;
     }
 
+    public LiveData<List<BusStop>> getSearchStops() {
+        return searchStopsLiveData;
+    }
+
     public void setLocation(double lat, double lon) {
         stopRepository.searchByLocation(lat, lon);
     }
@@ -44,6 +50,10 @@ public class StopsViewModel extends ViewModel {
 
     public void setSelectedStop(BusStop stop) {
         selectedStopLiveData.setValue(stop);
+    }
+
+    public void searchStops(String name, String route, String id) {
+        stopRepository.searchStops(name, route, id);
     }
 
     public void clearRealTimeData() {
