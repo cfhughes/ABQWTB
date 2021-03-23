@@ -1,21 +1,14 @@
 package com.abqwtb.schedule;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnClickListener;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,37 +18,18 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.abqwtb.ABQBusApplication;
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
-import com.abqwtb.bus.BusFragment;
 import com.abqwtb.model.BusStop;
-import com.abqwtb.model.BusTrip;
 import com.abqwtb.model.RealtimeTripInfo;
-import com.abqwtb.schedule.ScheduleAdapter.ViewHolder;
-import com.abqwtb.service.AtMyStopService;
 import com.abqwtb.stops.StopClockView;
 import com.abqwtb.viewmodel.StopsViewModel;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.firebase.analytics.FirebaseAnalytics;
-
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class StopFragment extends Fragment {
 
@@ -66,16 +40,13 @@ public class StopFragment extends Fragment {
   private BusStop stop;
   //private Tracker mTracker;
   private ScheduleAdapter adapter;
-  private RequestQueue queue;
   private ListView schedule;
   private Handler mHandler;
-  private StringRequest stringRequest;
   private SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
   private Runnable mRunnable;
   private Context context;
   private boolean favorite;
   private Set<String> savedStops;
-  private AtMyStopService atMyStopService;
   private StopClockView stopClockView;
   private StopsViewModel viewModel;
 
@@ -194,6 +165,7 @@ public class StopFragment extends Fragment {
     viewModel.getSelectedStop().observe(getViewLifecycleOwner(), new Observer<BusStop>() {
       @Override
       public void onChanged(BusStop stop) {
+        Log.v("Stop Id",stop.getId());
         StopFragment.this.stop = stop;
         mainText.setText(stop.getTitle());
         createStarView(view);

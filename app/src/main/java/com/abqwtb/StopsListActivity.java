@@ -156,8 +156,6 @@ public class StopsListActivity extends AppCompatActivity implements SearchDialog
   protected void onPause() {
     super.onPause();
 
-    FragmentManager.BackStackEntry current = getSupportFragmentManager().getBackStackEntryAt(0);
-
     Fragment stopView = getSupportFragmentManager().findFragmentByTag("stop_view");
     if (stopView != null && stopView.isVisible()) {
       Intent intent = new Intent(this, NotificationService.class);

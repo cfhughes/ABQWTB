@@ -22,13 +22,13 @@ import androidx.fragment.app.Fragment;
 
 import com.abqwtb.R;
 import com.abqwtb.StopsListActivity;
-import com.android.volley.Request.Method;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+//import com.android.volley.Request.Method;
+//import com.android.volley.RequestQueue;
+//import com.android.volley.Response.ErrorListener;
+//import com.android.volley.Response.Listener;
+//import com.android.volley.VolleyError;
+//import com.android.volley.toolbox.StringRequest;
+//import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -47,9 +47,9 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
   private GoogleMap map;
   private Runnable mRunnable;
   private Handler mHandler;
-  private RequestQueue queue;
-
-  private StringRequest request;
+//  private RequestQueue queue;
+//
+//  private StringRequest request;
   private TextView nextStop;
   private ProgressBar progressBar;
   private ProgressBarAnimation progressBarAnimation;
@@ -73,67 +73,67 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
     if (getArguments() != null) {
       int bus_id = getArguments().getInt(ARG_BUS_ID);
       String url = "http://www.abqwtb.com/android_bus.php?bus_id=" + bus_id;
-      request = new StringRequest(Method.GET, url, new Listener<String>() {
-        @Override
-        public void onResponse(String response) {
-          if (!isAdded()) {
-            return; //Stop if Fragment isn't in an activity
-          }
-          if (response.contains(":") && response.length() > 1) {
-            String[] coords = response.split(":");
-            nextStop.setText(String.format("Next Stop: %s", coords[0]));
-            LatLng position = new LatLng(Double.parseDouble(coords[1]),
-                Double.parseDouble(coords[2]));
-            CameraUpdate update = CameraUpdateFactory.newLatLng(position);
-            if (marker == null) {
-              Bitmap orig = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
-              Bitmap scaled = Bitmap.createScaledBitmap(orig, 128, 128, false);
-              marker = map.addMarker(new MarkerOptions().position(position)
-                  .icon(BitmapDescriptorFactory.fromBitmap(scaled))
-                  .title("Bus"));
-            } else {
-              marker.setPosition(position);
-            }
-            map.animateCamera(update);
-          } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage(
-                "An error occurred while retrieving data, the bus you were tracking may have gone off duty");
-            builder.setTitle("Data Error");
-            builder.setPositiveButton("Ok", new OnClickListener() {
-              @Override
-              public void onClick(DialogInterface dialog, int which) {
-
-              }
-            });
-            AlertDialog alert = builder.create();
-            alert.show();
-            getFragmentManager().popBackStack();
-          }
-        }
-      }, new ErrorListener() {
-        @Override
-        public void onErrorResponse(VolleyError error) {
-          if (!isAdded()) {
-            return;
-          }
-          AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-          builder.setMessage(
-              "An error occurred while retrieving data, please check your internet connection.");
-          builder.setTitle("Connection Error");
-          builder.setPositiveButton("Ok", new OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-          });
-          AlertDialog alert = builder.create();
-          alert.show();
-        }
-      });
+//      request = new StringRequest(Method.GET, url, new Listener<String>() {
+//        @Override
+//        public void onResponse(String response) {
+//          if (!isAdded()) {
+//            return; //Stop if Fragment isn't in an activity
+//          }
+//          if (response.contains(":") && response.length() > 1) {
+//            String[] coords = response.split(":");
+//            nextStop.setText(String.format("Next Stop: %s", coords[0]));
+//            LatLng position = new LatLng(Double.parseDouble(coords[1]),
+//                Double.parseDouble(coords[2]));
+//            CameraUpdate update = CameraUpdateFactory.newLatLng(position);
+//            if (marker == null) {
+//              Bitmap orig = BitmapFactory.decodeResource(getResources(), R.drawable.icon);
+//              Bitmap scaled = Bitmap.createScaledBitmap(orig, 128, 128, false);
+//              marker = map.addMarker(new MarkerOptions().position(position)
+//                  .icon(BitmapDescriptorFactory.fromBitmap(scaled))
+//                  .title("Bus"));
+//            } else {
+//              marker.setPosition(position);
+//            }
+//            map.animateCamera(update);
+//          } else {
+//            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//            builder.setMessage(
+//                "An error occurred while retrieving data, the bus you were tracking may have gone off duty");
+//            builder.setTitle("Data Error");
+//            builder.setPositiveButton("Ok", new OnClickListener() {
+//              @Override
+//              public void onClick(DialogInterface dialog, int which) {
+//
+//              }
+//            });
+//            AlertDialog alert = builder.create();
+//            alert.show();
+//            getFragmentManager().popBackStack();
+//          }
+//        }
+//      }, new ErrorListener() {
+//        @Override
+//        public void onErrorResponse(VolleyError error) {
+//          if (!isAdded()) {
+//            return;
+//          }
+//          AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//          builder.setMessage(
+//              "An error occurred while retrieving data, please check your internet connection.");
+//          builder.setTitle("Connection Error");
+//          builder.setPositiveButton("Ok", new OnClickListener() {
+//            @Override
+//            public void onClick(DialogInterface dialog, int which) {
+//
+//            }
+//          });
+//          AlertDialog alert = builder.create();
+//          alert.show();
+//        }
+//      });
     }
     mHandler = new Handler();
-    queue = Volley.newRequestQueue(getContext());
+    //queue = Volley.newRequestQueue(getContext());
 
 //    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
 //    mTracker = application.getDefaultTracker();
@@ -167,7 +167,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
         == PackageManager.PERMISSION_GRANTED) {
       googleMap.setMyLocationEnabled(true);
     }
-    queue.add(request);
+    //queue.add(request);
     progressBarAnimation = new ProgressBarAnimation(progressBar, 0, 100);
     progressBarAnimation.setDuration(1000 * 15);
     progressBar.startAnimation(progressBarAnimation);
@@ -175,7 +175,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
 
       @Override
       public void run() {
-        queue.add(request);
+        //queue.add(request);
         mHandler.postDelayed(mRunnable, 1000 * 15); // 15 seconds
         progressBar.startAnimation(progressBarAnimation);
       }
@@ -193,7 +193,7 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
   public void onResume() {
     super.onResume();
     if (map != null) {
-      queue.add(request);
+      //queue.add(request);
       mHandler.postDelayed(mRunnable, 1000 * 15); // 15 seconds
       progressBar.startAnimation(progressBarAnimation);
     }

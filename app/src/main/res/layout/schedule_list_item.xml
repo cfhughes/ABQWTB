@@ -39,11 +39,11 @@
       android:textAppearance="?android:attr/textAppearanceListItem"
       android:textSize="24sp" />
 
-  <ImageView
-    android:id="@+id/bus_schedule_arrow"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="center_vertical"
-    android:src="@drawable/right_arrow"/>
+<!--  <ImageView-->
+<!--    android:id="@+id/bus_schedule_arrow"-->
+<!--    android:layout_width="wrap_content"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_gravity="center_vertical"-->
+<!--    android:src="@drawable/right_arrow"/>-->
 
 </LinearLayout>

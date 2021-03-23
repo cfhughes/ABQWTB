@@ -3,6 +3,7 @@ package com.abqwtb.schedule;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,12 @@ import android.widget.TextView;
 import com.abqwtb.R;
 import com.abqwtb.RouteIcon;
 import com.abqwtb.model.BusStop;
-import com.abqwtb.model.BusTrip;
 import com.abqwtb.model.RealtimeTripInfo;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+
 import org.joda.time.DateTimeZone;
 import org.joda.time.DurationFieldType;
 import org.joda.time.LocalTime;
@@ -32,10 +34,13 @@ public class ScheduleAdapter extends ArrayAdapter<RealtimeTripInfo> {
     @Override
     public void run() {
       synchronized (lstHolders) {
-        LocalTime nowc = LocalTime.now(DateTimeZone.forID("America/Denver"));
+        LocalTime nowc = LocalTime.now(DateTimeZone.forID("UTC"));
         long now = nowc.getMillisOfDay();
-        for (ViewHolder holder : lstHolders) {
-          holder.updateTime(now);
+        ListIterator<ViewHolder> iter = lstHolders.listIterator();
+        while (iter.hasNext()) {
+          if (iter.next().updateTime(now)) {
+            iter.remove();
+          }
         }
         //Log.v("Timer","Update Time");
         mHandler.postDelayed(updateRemainingTimeRunnable, 1000);
@@ -65,7 +70,7 @@ public class ScheduleAdapter extends ArrayAdapter<RealtimeTripInfo> {
       viewHolder.scheduleTimer = convertView.findViewById(R.id.schedule_timer);
       viewHolder.tripName = convertView.findViewById(R.id.trip_name);
       viewHolder.ll = convertView.findViewById(R.id.schedule_routes_layout);
-      viewHolder.arrow = convertView.findViewById(R.id.bus_schedule_arrow);
+      //viewHolder.arrow = convertView.findViewById(R.id.bus_schedule_arrow);
       convertView.setTag(viewHolder);
       synchronized (lstHolders) {
         lstHolders.add(viewHolder);
@@ -99,7 +104,7 @@ public class ScheduleAdapter extends ArrayAdapter<RealtimeTripInfo> {
         expectedTime = LocalTime.parse(trip.getScheduledTime()).withFieldAdded(DurationFieldType.seconds(),
             Math.round(trip.getSecondsLate()));
 
-        LocalTime nowc = LocalTime.now(DateTimeZone.forID("America/Denver"));
+        LocalTime nowc = LocalTime.now(DateTimeZone.forID("UTC"));
         long now = nowc.getMillisOfDay();
         updateTime(now);
 
@@ -155,7 +160,7 @@ public class ScheduleAdapter extends ArrayAdapter<RealtimeTripInfo> {
       return null;
     }
 
-    public void updateTime(long now) {
+    public boolean updateTime(long now) {
       if (trip.getScheduledTime() != null) {
         long diff = expectedTime.getMillisOfDay() - now;
         //Log.i("diff",""+scheduled.getTimeInMillis()+ " - " + now + " = " + diff);
@@ -163,14 +168,27 @@ public class ScheduleAdapter extends ArrayAdapter<RealtimeTripInfo> {
         if (diff < -7 * 60 * 60 * 1000) {
           diff += 24 * 60 * 60 * 1000;
         }
+        if (diff > 12 * 60 * 60 * 1000) {
+          diff -= 24 * 60 * 60 * 1000;
+        }
+        if (diff < -120 * 1000) {
+          Log.v("Removed","Removed "+trip.getDisplayTime());
+          remove(trip);
+          return true; //remove
+        }
         if (diff < 0) {
           diff = 0;
         }
         int seconds = (int) (diff / 1000) % 60;
         int minutes = (int) (diff / (1000 * 60));
 
-        scheduleTimer.setText(String.format("%d:%02d", minutes, seconds));
+        if (minutes < 5) {
+          scheduleTimer.setText(String.format("%d:%02d", minutes, seconds));
+        } else {
+          scheduleTimer.setText(String.format("%d", minutes));
+        }
       }
+      return false;
     }
   }
 }

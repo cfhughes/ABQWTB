@@ -1,5 +1,6 @@
 package com.abqwtb.model;
 
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalTime;
 
 public class RealtimeTripInfo implements Comparable<RealtimeTripInfo> {
@@ -87,5 +88,18 @@ public class RealtimeTripInfo implements Comparable<RealtimeTripInfo> {
 
     public void setTextColor(String textColor) {
         this.textColor = textColor;
+    }
+
+    public long secondsFromNow() {
+        LocalTime time = LocalTime.parse(getScheduledTime());
+        LocalTime now = LocalTime.now(DateTimeZone.forOffsetHours(0));
+        long secondsFromNow = (time.getMillisOfDay() - now.getMillisOfDay() + (getSecondsLate() * 1000))/1000;
+        if (secondsFromNow < -7 * 60 * 60) {
+            secondsFromNow += 24 * 60 * 60;
+        }
+        else if (secondsFromNow > 12 * 60 * 60) {
+            secondsFromNow -= 24 * 60 * 60;
+        }
+        return secondsFromNow;
     }
 }

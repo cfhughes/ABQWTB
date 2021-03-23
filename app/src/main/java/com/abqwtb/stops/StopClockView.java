@@ -3,7 +3,9 @@ package com.abqwtb.stops;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -54,6 +56,7 @@ public class StopClockView extends View {
         paint.setStyle(Paint.Style.STROKE);
         paint.setAntiAlias(true);
         paint.setStrokeWidth(9.0f);
+        paint.setStrokeCap(Paint.Cap.ROUND);
 
         //canvas.drawArc(50,50,diameter-50,diameter-50,-90f,90f, true, paint);
 
@@ -70,18 +73,22 @@ public class StopClockView extends View {
 
             LocalTime time = LocalTime.parse(trip.getScheduledTime());
 
-            LocalTime now = LocalTime.now(DateTimeZone.forOffsetHours(-7));
+            LocalTime now = LocalTime.now(DateTimeZone.forOffsetHours(0));
 
             //float scheduledFromNow = (time.getMillisOfDay() - now.getMillisOfDay() + 0.0f) / (60 * 60 * 1000);
 
-            float actualFromNow = (time.getMillisOfDay() - now.getMillisOfDay() + 0.0f + (trip.getSecondsLate() * 1000)) / (60 * 60 * 1000);
+            float actualFromNow = trip.secondsFromNow() / (60.0f * 60.0f);
 
             //canvas.drawArc(0,0,diameter*0.8f,diameter*0.8f,268 - (scheduledFromNow*360),4, true, tripPaint);
             if (actualFromNow < 0) actualFromNow = 0;
-            canvas.drawArc(leftMargin,45,diameter+leftMargin,diameter+45,268 - (actualFromNow*360),4, true, actualPaint);
+            if (actualFromNow < 0.95 ) {
+                canvas.drawArc(leftMargin, 45, diameter + leftMargin, diameter + 45, 268 - (actualFromNow * 360), 4, true, actualPaint);
+            }
         }
 
         canvas.drawCircle(leftMargin+diameter/2.0f,diameter/2.0f+45,diameter/2.0f,paint);
+
+        canvas.drawCircle(leftMargin+diameter/2.0f,diameter/2.0f+45,diameter/29.0f,paint);
 
         canvas.drawLine(leftMargin+(diameter/2.0f),0,leftMargin+(diameter/2.0f),diameter/2.0f,paint);
 

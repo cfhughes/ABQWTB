@@ -1,6 +1,8 @@
 package com.abqwtb.notifications;
 
+import android.app.Notification;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
@@ -8,6 +10,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Process;
 import android.util.Log;
+import android.widget.RemoteViews;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -56,7 +59,7 @@ public class NotificationService extends LifecycleService {
                     e.printStackTrace();
                 }
                 try {
-                    Thread.sleep(15_000);
+                    Thread.sleep(60_000);
                 } catch (InterruptedException e) {
                     // Restore interrupt status.
                     Thread.currentThread().interrupt();
@@ -72,20 +75,26 @@ public class NotificationService extends LifecycleService {
 
         RealtimeTripInfo info = stop.get(0);
 
-        LocalTime time = LocalTime.parse(info.getScheduledTime());
-
-        LocalTime now = LocalTime.now(DateTimeZone.forOffsetHours(-7));
-
-        float actualMinutesFromNow = (time.getMillisOfDay() - now.getMillisOfDay() + 0.0f + (info.getSecondsLate() * 1000)) / (60 * 1000);
+        float actualMinutesFromNow = info.secondsFromNow() / 60.0f;
 
         Log.v("Times",String.format("Update %s bus %s %d",info.getRoute(),info.getScheduledTime(),info.getSecondsLate()));
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(NotificationService.this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_stat_directions_bus)
-                .setContentTitle("ABQWTB")
+                .setContentTitle("Bus Update")
+                .setOnlyAlertOnce(true)
                 .setContentText(String.format("%s bus is %.0f minutes away",info.getRoute(),actualMinutesFromNow))
                 .setTimeoutAfter(60000)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            RemoteViews contentView = new RemoteViews(getPackageName(), R.layout.notification);
+//            contentView.setTextViewText(R.id.notification_text,String.format("%s bus is %.0f minutes away",info.getRoute(),actualMinutesFromNow));
+//            contentView.setTextViewText(R.id.route_text, info.getRoute());
+//            contentView.
+//            builder.setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+//                    .setCustomContentView(contentView);
+//        }
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(NotificationService.this);
 
