@@ -24,7 +24,6 @@ import java.util.List;
 public class StopClockView extends View {
     private float diameter;
     private List<RealtimeTripInfo> trips = new ArrayList<>();
-    private List<BusStop.TripHeadSign> tripHeadsigns;
     private float leftMargin;
 
     public StopClockView(Context context, @Nullable AttributeSet attrs) {
@@ -75,7 +74,7 @@ public class StopClockView extends View {
 
             LocalTime now = LocalTime.now(DateTimeZone.forOffsetHours(0));
 
-            //float scheduledFromNow = (time.getMillisOfDay() - now.getMillisOfDay() + 0.0f) / (60 * 60 * 1000);
+            float scheduledFromNow = (time.getMillisOfDay() - now.getMillisOfDay() + 0.0f) / (60 * 60 * 1000);
 
             float actualFromNow = trip.secondsFromNow() / (60.0f * 60.0f);
 

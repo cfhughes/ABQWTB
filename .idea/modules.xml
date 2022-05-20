@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/ABQWTB.iml" filepath="$PROJECT_DIR$/.idea/modules/ABQWTB.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/ABQWTB.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/ABQWTB.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/atmystop/ABQWTB.atmystop.iml" filepath="$PROJECT_DIR$/.idea/modules/atmystop/ABQWTB.atmystop.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/atmystopshared/ABQWTB.atmystopshared.iml" filepath="$PROJECT_DIR$/.idea/modules/atmystopshared/ABQWTB.atmystopshared.iml" />
     </modules>
   </component>
 </project>
