@@ -1,6 +1,7 @@
 package com.abqwtb.bus;
 
 import android.Manifest.permission;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -38,6 +39,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 public class BusFragment extends Fragment implements OnMapReadyCallback {
 
@@ -199,6 +201,10 @@ public class BusFragment extends Fragment implements OnMapReadyCallback {
     }
     //mTracker.setScreenName("ABQBus Tracker");
     //mTracker.send(new HitBuilders.ScreenViewBuilder().build());
+    Activity activity = getActivity();
+    if (activity != null) {
+      FirebaseAnalytics.getInstance(activity).setCurrentScreen(activity, "Bus Tracker", null);
+    }
   }
 
   public void onStart() {

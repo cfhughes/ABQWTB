@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.abqwtb"
-  android:installLocation="auto">
+    android:installLocation="auto">
 
   <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
   <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -22,7 +21,8 @@
     android:theme="@style/Theme.AppCompat.Light.NoActionBar"
     android:usesCleartextTraffic="true"
       tools:ignore="GoogleAppIndexingWarning">
-    <activity android:name=".StopsListActivity">
+    <activity android:name=".StopsListActivity"
+        android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
 
