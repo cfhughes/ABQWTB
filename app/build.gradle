@@ -7,8 +7,8 @@ android {
         applicationId "com.abqwtb"
         minSdkVersion 19
         targetSdkVersion 33
-        versionCode 113
-        versionName "2.2.0"
+        versionCode 114
+        versionName "2.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "google_maps_key",
                 (project.findProperty("GOOGLE_MAPS_API_KEY") ?: "")
@@ -50,7 +50,7 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.8.0'
     implementation 'com.android.volley:volley:1.2.1'
-    implementation 'net.danlew:android.joda:2.9.9.2'
+    implementation 'net.danlew:android.joda:2.12.4'
     testImplementation 'junit:junit:4.13.2'
     implementation "androidx.core:core-ktx:1.9.0"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

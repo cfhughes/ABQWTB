@@ -86,7 +86,7 @@ public class StopFragment extends Fragment {
       Log.v("Stop_id", "" + stop_id);
     }
 
-    String url = "http://www.abqwtb.com/android.php?version=6&stop_id=" + stop_id;
+    String url = "http://www.abqwtb.com/android.php?version=7&stop_id=" + stop_id;
 
 /*    ABQBusApplication application = (ABQBusApplication) getActivity().getApplication();
     mTracker = application.getDefaultTracker();
